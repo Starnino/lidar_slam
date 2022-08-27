@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<package format="2">
+  <name>lidarslam</name>
+  <version>0.0.0</version>
+  <description>SLAM with loop closure detection using Superpoint features</description>
+  <maintainer email="francesco.starna@mail.com">Francesco Starna</maintainer>
+  <license>MIT</license>
+  <!-- <url type="website">http://wiki.ros.org/slam</url> -->
+  <buildtool_depend>catkin</buildtool_depend>
+  <depend>roscpp</depend>
+  <depend>sensor_msgs</depend>
+  <depend>rosbag</depend>
+</package>

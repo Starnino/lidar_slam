@@ -9,3 +9,6 @@ target_link_libraries(test_superpoint_extraction core utils ${OpenCV_LIBS} ${cat
 
 add_executable(test_superpoint_tracking test_superpoint_tracking.cpp)
 target_link_libraries(test_superpoint_tracking core utils ${OpenCV_LIBS} ${catkin_LIBRARIES} ${TORCH_LIBRARIES})
+
+add_executable(test_ransac test_ransac.cpp)
+target_link_libraries(test_ransac core utils ${catkin_LIBRARIES})

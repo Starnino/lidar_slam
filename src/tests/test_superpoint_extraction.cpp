@@ -7,7 +7,7 @@
 #include <opencv2/highgui.hpp>
 
 #define TOPIC "/os1_cloud_node/points"
-#define PACKAGE_NAME "slam"
+#define PACKAGE_NAME "lidarslam"
 #define LIDAR_CONFIG_FILE "/config/lidar.cfg"
 #define SUPERPOINT_CONFIG_FILE "/config/superpoint.cfg"
 

@@ -3,7 +3,8 @@ add_library(core
   cvimage.cpp cvimage.hpp
   projector.cpp projector.hpp
   superpoint.cpp superpoint.hpp
-  tracker.cpp tracker.hpp)
+  tracker.cpp tracker.hpp
+  registrator.cpp registrator.hpp)
 
 target_link_libraries(core 
   ${OpenCV_LIBRARIES}

@@ -9,20 +9,20 @@ struct Data {
 template <typename D>
 struct Model {
   virtual void fit(D& data) = 0;
-  virtual int evaluate(Data<D>& data, float inlier_threshold) = 0;
+  virtual int evaluate(Data<D>& data, float inliers_threshold) = 0;
   virtual Model* clone() const = 0;
 };  
 
-template <typename D>
-Model<D>* RANSAC(Model<D>& model, Data<D>& data, int num_iterations, float inlier_threshold, int n) {
+template <typename M, typename D>
+Model<D>* RANSAC(Data<D>& data, int num_iterations, float inliers_threshold, int n) {
   int iteration = 0; int best_score = 0;
-  Model<D>* best_model;
+  Model<D>* best_model; M model;
 
   while (iteration++ < num_iterations) {
     
     D random_data = data.randomSelect(n);
     model.fit(random_data);
-    int score = model.evaluate(data, inlier_threshold);
+    int score = model.evaluate(data, inliers_threshold);
 
     if (score > best_score) {
       best_model = model.clone();

@@ -30,7 +30,7 @@ vector<cv::DMatch> Tracker::match(cv::Mat& descriptors1, cv::Mat& descriptors2) 
   return good_matches;
 }
 
-vector<pair<cv::Point2f,cv::Point2f>> Tracker::update(vector<cv::KeyPoint>& keypoints, cv::Mat& descriptors) {
+Pointset2f Tracker::update(vector<cv::KeyPoint>& keypoints, cv::Mat& descriptors) {
   // save descriptors
   if (_last_descriptors.empty()) {
     _last_descriptors = descriptors.clone();
@@ -39,7 +39,7 @@ vector<pair<cv::Point2f,cv::Point2f>> Tracker::update(vector<cv::KeyPoint>& keyp
   }
   vector<cv::DMatch> matches = match(_last_descriptors, descriptors);
   
-  vector<pair<cv::Point2f,cv::Point2f>> correspondeces(matches.size()); 
+  Pointset2f correspondeces(matches.size()); 
   for (size_t i = 0; i < matches.size(); ++i) {
     int queryIdx = matches[i].queryIdx;
     int trainIdx = matches[i].trainIdx;

@@ -13,6 +13,7 @@
 #define LIDAR_CONFIG_FILE "/config/lidar.cfg"
 #define SUPERPOINT_CONFIG_FILE "/config/superpoint.cfg"
 #define RANSAC_CONFIG_FILE "/config/ransac.cfg"
+#define MATCH_CONFIG_FILE "/config/match.cfg"
 
 using std::cout;
 
@@ -27,7 +28,7 @@ int main(int argc, char **argv) {
   
   Projector projector = json::loadProjectorConfig(path + LIDAR_CONFIG_FILE);
   SuperPointDetector superpoint = json::loadSuperPointConfig(path, SUPERPOINT_CONFIG_FILE);
-  Tracker tracker(Matcher::BFMatcher);
+  Tracker tracker = json::loadMatchConfig(Matcher::BFMatcher, path + MATCH_CONFIG_FILE);
   auto [ransac_iterations, inliers_threshold] = json::loadRANSACConfig(path + RANSAC_CONFIG_FILE);
   Registrator registrator = Registrator(ransac_iterations, inliers_threshold);
   Image last_img;

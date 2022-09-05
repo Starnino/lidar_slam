@@ -17,14 +17,15 @@ class Tracker {
 
   private:
     cv::Ptr<cv::DescriptorMatcher> _matcher;
+    float _knn_threshold;
+    int _norm_threshold;
     cv::Mat _last_descriptors;
     vector<cv::KeyPoint> _last_keypoints;
-    float _knn_threshold;
     unordered_map<int, pair<vector<cv::Point2f>,cv::Scalar>> _tracks;
     vector<cv::DMatch> match(cv::Mat& descriptors1, cv::Mat& descriptors2);
 
   public:
-    explicit Tracker(Matcher matcher, float knn_threshold = 0.7f);
+    explicit Tracker(Matcher matcher, float knn_threshold, int norm_threshold);
 
     Pointset2f update(vector<cv::KeyPoint>& keypoints, cv::Mat& descriptors);
     unordered_map<int,pair<vector<cv::Point2f>,cv::Scalar>> updateTracks(vector<cv::KeyPoint>& keypoints, cv::Mat& descriptors);

@@ -40,3 +40,15 @@ tuple<int,float> json::loadRANSACConfig(string path) {
 
   return {iterations, inliers_threshold};
 }
+
+Tracker json::loadMatchConfig(Matcher matcher, string path) {
+  Json::Reader reader;
+  Json::Value cfg;
+  std::ifstream file(path);
+  reader.parse(file, cfg);
+
+  float knn_threshold = cfg["Matcher"]["knn_threshold"].asFloat();
+  int norm_threshold = cfg["Matcher"]["norm_threshold"].asInt();
+
+  return Tracker(matcher, knn_threshold, norm_threshold);
+}

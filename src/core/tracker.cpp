@@ -1,6 +1,6 @@
 #include "tracker.hpp"
 
-Tracker::Tracker(Matcher matcher, float knn_threshold) {
+Tracker::Tracker(Matcher matcher, float knn_threshold, int norm_threshold) {
   switch (matcher) {
   
   case Matcher::BFMatcher:
@@ -13,6 +13,7 @@ Tracker::Tracker(Matcher matcher, float knn_threshold) {
   }
 
   _knn_threshold = knn_threshold;
+  _norm_threshold = norm_threshold;
 }
 
 vector<cv::DMatch> Tracker::match(cv::Mat& descriptors1, cv::Mat& descriptors2) {
@@ -44,7 +45,7 @@ Pointset2f Tracker::update(vector<cv::KeyPoint>& keypoints, cv::Mat& descriptors
   for (size_t i = 0; i < matches.size(); ++i) {
     cv::Point2f query_point = _last_keypoints[matches[i].queryIdx].pt;
     cv::Point2f train_point = keypoints[matches[i].trainIdx].pt;
-    if (cv::norm(query_point-train_point) < 100) {
+    if (cv::norm(query_point-train_point) < _norm_threshold) {
       correspondeces.push_back({query_point, train_point});
     }
   }

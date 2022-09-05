@@ -69,7 +69,7 @@ class Registrator {
 
   public:
     inline explicit Registrator(int ransac_iterations, float inliers_threshold) {
-      srand(time(NULL));
+      srand(0);
       _ransac_iterations = ransac_iterations;
       _inliers_threshold = inliers_threshold;
       _prev_pose = Pose();

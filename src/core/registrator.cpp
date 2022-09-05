@@ -76,7 +76,6 @@ tuple<Affine3f,Pointset3f,vector<bool>>  Registrator::registerPoints(Pointset3f&
     Model<Pointset3f>* model = RANSAC<Pose,Pointset3f>(points, _ransac_iterations, _inliers_threshold, 3);
     Pose pose = *(static_cast<Pose*>(model));
     return {pose.matrix(), pose.inliers(), pose.mask()};
-    //_prev_pose = _prev_pose*pose;
   }
 
   return {_prev_pose.matrix(), {}, {}};

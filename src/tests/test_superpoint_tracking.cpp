@@ -11,6 +11,7 @@
 #define PACKAGE_NAME "lidarslam"
 #define LIDAR_CONFIG_FILE "/config/lidar.cfg"
 #define SUPERPOINT_CONFIG_FILE "/config/superpoint.cfg"
+#define MATCH_CONFIG_FILE "/config/match.cfg"
 
 using std::cout;
 
@@ -25,7 +26,7 @@ int main(int argc, char **argv) {
   
   Projector projector = json::loadProjectorConfig(path + LIDAR_CONFIG_FILE);
   SuperPointDetector superpoint = json::loadSuperPointConfig(path, SUPERPOINT_CONFIG_FILE);
-  Tracker tracker(Matcher::BFMatcher);
+  Tracker tracker = json::loadMatchConfig(Matcher::BFMatcher, MATCH_CONFIG_FILE);
 
   rosbag::Bag bag(argv[1]);
   for (rosbag::MessageInstance const m: rosbag::View(bag)) {

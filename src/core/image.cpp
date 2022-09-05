@@ -45,7 +45,7 @@ cv::Mat Image::drawMatches(Image& img1, Image& img2, Pointset2f& matches, vector
       cv::Scalar color = inliers_mask[i] ? cv::Scalar(0.f, 1.f, 0.f) : cv::Scalar(0.f, 0.f, 1.f);
       cv::circle(color_img, point1, 2, color, cv::FILLED);
       cv::circle(color_img, point2, 2, color, cv::FILLED);
-      cv::line(color_img, point1, point2, color, 1);
+      if (inliers_mask[i]) cv::line(color_img, point1, point2, color, 1);
       i++;
     } 
   }

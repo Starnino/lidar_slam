@@ -6,6 +6,7 @@
 #include <tuple>
 #include <core/projector.hpp>
 #include <core/superpoint.hpp>
+#include <core/tracker.hpp>
 
 using std::string;
 using std::tuple;
@@ -14,4 +15,5 @@ namespace json {
   Projector loadProjectorConfig(string path);
   SuperPointDetector loadSuperPointConfig(string path, string config_filename);
   tuple<int,float> loadRANSACConfig(string path);
+  Tracker loadMatchConfig(Matcher matcher, string path);
 }

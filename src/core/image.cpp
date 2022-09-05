@@ -1,5 +1,4 @@
 #include "image.hpp"
-#include <iostream>
 
 Image::Image(int rows, int cols) {
     _rows = rows;

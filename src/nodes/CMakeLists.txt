@@ -1,2 +1,2 @@
 add_executable(feature_extractor feature_extractor.cpp)
-target_link_libraries(feature_extractor core ${catkin_LIBRARIES})
+target_link_libraries(feature_extractor core utils ${catkin_LIBRARIES})

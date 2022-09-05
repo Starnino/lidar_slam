@@ -78,6 +78,6 @@ tuple<Affine3f,Pointset3f,vector<bool>>  Registrator::registerPoints(Pointset3f&
     return {pose.matrix(), pose.inliers(), pose.mask()};
   }
 
-  return {_prev_pose.matrix(), {}, {}};
+  return {Affine3f::Identity(), {}, {}};
 }
 

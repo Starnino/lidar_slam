@@ -72,7 +72,6 @@ class Registrator {
       srand(0);
       _ransac_iterations = ransac_iterations;
       _inliers_threshold = inliers_threshold;
-      _prev_pose = Pose();
     }
 
     tuple<Affine3f,Pointset3f,vector<bool>> registerPoints(Pointset3f& points);

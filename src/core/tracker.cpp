@@ -103,7 +103,7 @@ unordered_map<int,pair<vector<cv::Point2f>,cv::Scalar>> Tracker::updateTracks(ve
   }
 
   _last_descriptors = new_descriptors.clone();
- 
+  
   // eliminate ending tracks
   for (auto& track : _tracks) {
     if (!usedIdx.count(track.first)) {

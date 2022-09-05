@@ -26,7 +26,7 @@ int main(int argc, char **argv) {
   
   Projector projector = json::loadProjectorConfig(path + LIDAR_CONFIG_FILE);
   SuperPointDetector superpoint = json::loadSuperPointConfig(path, SUPERPOINT_CONFIG_FILE);
-  Tracker tracker = json::loadMatchConfig(Matcher::BFMatcher, MATCH_CONFIG_FILE);
+  Tracker tracker = json::loadMatchConfig(Matcher::BFMatcher, path + MATCH_CONFIG_FILE);
 
   rosbag::Bag bag(argv[1]);
   for (rosbag::MessageInstance const m: rosbag::View(bag)) {

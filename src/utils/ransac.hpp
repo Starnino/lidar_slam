@@ -1,5 +1,4 @@
 #pragma once
-#include <iostream>
 
 template <typename D>
 struct Data {
@@ -15,8 +14,8 @@ struct Model {
 
 template <typename M, typename D>
 Model<D>* RANSAC(Data<D>& data, int num_iterations, float inliers_threshold, int n) {
-  int iteration = 0; int best_score = 0;
-  Model<D>* best_model; M model;
+  Model<D>* best_model; int best_score = 0;
+  int iteration = 0; M model;
 
   while (iteration++ < num_iterations) {
     

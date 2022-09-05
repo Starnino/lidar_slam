@@ -24,7 +24,7 @@ int main(int argc, char **argv) {
   // generate random points with correct association
   for (int i = 0; i < 30; ++i) {
     Point3f point = Point3f::Random()*10;
-    set.push_back({point, (R*point + t)  + Point3f::Random()*0.5f});
+    set.push_back({point, (R*point + t)  + Point3f::Random()});
   }
   // generate random points with wrong associations
   for (int i = 0; i < 10; ++i) {

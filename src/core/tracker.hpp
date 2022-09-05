@@ -5,7 +5,6 @@
 #include <opencv2/core.hpp>
 #include <opencv2/features2d.hpp>
 
-
 using std::vector;
 using std::unordered_map;
 using std::set;

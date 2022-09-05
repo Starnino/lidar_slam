@@ -1,6 +1,6 @@
 add_library(core 
   pointcloud.cpp pointcloud.hpp
-  cvimage.cpp cvimage.hpp
+  image.cpp image.hpp
   projector.cpp projector.hpp
   superpoint.cpp superpoint.hpp
   tracker.cpp tracker.hpp

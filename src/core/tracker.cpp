@@ -27,6 +27,7 @@ vector<cv::DMatch> Tracker::match(cv::Mat& descriptors1, cv::Mat& descriptors2) 
       good_matches.push_back(knn_matches[i][0]);
     }
   }
+
   return good_matches;
 }
 
@@ -39,11 +40,13 @@ Pointset2f Tracker::update(vector<cv::KeyPoint>& keypoints, cv::Mat& descriptors
   }
   vector<cv::DMatch> matches = match(_last_descriptors, descriptors);
   
-  Pointset2f correspondeces(matches.size()); 
+  Pointset2f correspondeces;
   for (size_t i = 0; i < matches.size(); ++i) {
-    int queryIdx = matches[i].queryIdx;
-    int trainIdx = matches[i].trainIdx;
-    correspondeces[i] = {_last_keypoints[queryIdx].pt, keypoints[trainIdx].pt};
+    cv::Point2f query_point = _last_keypoints[matches[i].queryIdx].pt;
+    cv::Point2f train_point = keypoints[matches[i].trainIdx].pt;
+    if (cv::norm(query_point-train_point) < 100) {
+      correspondeces.push_back({query_point, train_point});
+    }
   }
 
   _last_descriptors = descriptors.clone();

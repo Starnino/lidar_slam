@@ -12,3 +12,6 @@ target_link_libraries(test_superpoint_tracking core utils ${OpenCV_LIBS} ${catki
 
 add_executable(test_ransac test_ransac.cpp)
 target_link_libraries(test_ransac core utils ${catkin_LIBRARIES})
+
+add_executable(test_registration test_registration.cpp)
+target_link_libraries(test_registration core utils ${OpenCV_LIBS} ${catkin_LIBRARIES} ${TORCH_LIBRARIES})

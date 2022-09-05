@@ -31,12 +31,12 @@ int main(int argc, char **argv) {
     if (m.getTopic() != TOPIC) continue;
     sensor_msgs::PointCloud2::ConstPtr cloud_msg = m.instantiate<sensor_msgs::PointCloud2>();
     PointCloud cloud = deserializeCloudMsg(cloud_msg);
-    CVImage img = pointCloud2Img(cloud, projector);
+    Image img = pointCloud2Img(cloud, projector);
 
     vector<cv::KeyPoint> keypoints;
     superpoint.detect(img.intensity(), keypoints);
     
-    CVImage detection(cloud.h(), cloud.w());
+    Image detection(cloud.h(), cloud.w());
     cv::cvtColor(img.intensity(), detection.intensity(), cv::COLOR_GRAY2RGB);
     detection.drawKeypoints(keypoints);
 

@@ -28,7 +28,7 @@ int main(int argc, char **argv) {
     if (m.getTopic() != TOPIC) continue;
     sensor_msgs::PointCloud2::ConstPtr cloud_msg = m.instantiate<sensor_msgs::PointCloud2>();
     PointCloud cloud = deserializeCloudMsg(cloud_msg);
-    CVImage img = pointCloud2Img(cloud, projector);
+    Image img = pointCloud2Img(cloud, projector);
     
     cv::imshow("Intensity", img.intensity());   
     cv::waitKey(1);

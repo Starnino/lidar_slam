@@ -47,6 +47,7 @@ void Pose::fit(Pointset3f& points) {
   _rotation = R;
   _translation = t;
   _inliers.clear();
+  _mask.clear();
 }
 
 int Pose::evaluate(Data<Pointset3f>& data, float inliers_threshold) {
@@ -61,21 +62,23 @@ int Pose::evaluate(Data<Pointset3f>& data, float inliers_threshold) {
     if (euclidean_dist < inliers_threshold) {
       num_inliers++;
       _inliers.push_back(pointpair);
+      _mask.push_back(true);
     }
+    else _mask.push_back(false);
   }
 
   return num_inliers;
 }
 
-tuple<Affine3f,Pointset3f>  Registrator::registerPoints(Pointset3f& pointset) {
+tuple<Affine3f,Pointset3f,vector<bool>>  Registrator::registerPoints(Pointset3f& pointset) {
   if (pointset.size() != 0) {
     Points points(pointset);
     Model<Pointset3f>* model = RANSAC<Pose,Pointset3f>(points, _ransac_iterations, _inliers_threshold, 3);
     Pose pose = *(static_cast<Pose*>(model));
-    return {pose.matrix(), pose.inliers()};
+    return {pose.matrix(), pose.inliers(), pose.mask()};
     //_prev_pose = _prev_pose*pose;
   }
 
-  return {_prev_pose.matrix(), {}};
+  return {_prev_pose.matrix(), {}, {}};
 }
 

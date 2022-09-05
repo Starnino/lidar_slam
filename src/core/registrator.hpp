@@ -1,7 +1,7 @@
 #pragma once 
 
 #include <tuple>
-#include <core/cvimage.hpp>
+#include <core/image.hpp>
 #include <utils/ransac.hpp>
 #include <Eigen/Geometry>
 #include <Eigen/SVD>
@@ -29,6 +29,7 @@ struct Pose : Model<Pointset3f> {
   Matrix3f _rotation;
   Vector3f _translation;
   Pointset3f _inliers;
+  vector<bool> _mask;
   
   explicit Pose() { 
     _rotation = Matrix3f::Identity();
@@ -41,6 +42,7 @@ struct Pose : Model<Pointset3f> {
   inline const Matrix3f& rotation() const { return _rotation; }
   inline const Vector3f& translation() const { return _translation; }
   inline const Pointset3f& inliers() const { return _inliers; }
+  inline const vector<bool> mask() const { return _mask; }
   inline Pose operator*(const Pose& other) {
       Matrix3f R = rotation()*other.rotation();
       Vector3f t = rotation()*other.translation() + translation();
@@ -67,11 +69,11 @@ class Registrator {
 
   public:
     inline explicit Registrator(int ransac_iterations, float inliers_threshold) {
-      srand(0);
+      srand(time(NULL));
       _ransac_iterations = ransac_iterations;
       _inliers_threshold = inliers_threshold;
       _prev_pose = Pose();
     }
 
-    tuple<Affine3f,Pointset3f> registerPoints(Pointset3f& points);
+    tuple<Affine3f,Pointset3f,vector<bool>> registerPoints(Pointset3f& points);
 };

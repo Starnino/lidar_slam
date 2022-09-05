@@ -30,7 +30,7 @@ Eigen::Array<T,-1,1> clamp(Eigen::Array<T,-1,1>& arr, T min, T max) {
     return arr;
 };
 
-CVImage pointCloud2Img(PointCloud& cloud, Projector& projector) {
+Image pointCloud2Img(PointCloud& cloud, Projector& projector) {
   int height = projector.height();
   int width = projector.width();
   float fov_up = (projector.fov_up() * EIGEN_PI) / 180.f;
@@ -39,7 +39,7 @@ CVImage pointCloud2Img(PointCloud& cloud, Projector& projector) {
   float max_depth = projector.max_depth();
 
   // inizialize image
-  CVImage img(height, width);
+  Image img(height, width);
   
   // spherical projection
   ArrayXf radius = Eigen::sqrt(cloud.x().square() + cloud.y().square() + cloud.z().square());

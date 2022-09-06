@@ -2,7 +2,6 @@
 #include <utils/cloud_helper.hpp>
 #include <utils/json_helper.cpp>
 #include <utils/define.hpp>
-#include <core/tracker.hpp>
 #include <ros/package.h>
 #include <rosbag/bag.h>
 #include <rosbag/view.h>

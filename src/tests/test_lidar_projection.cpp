@@ -1,14 +1,11 @@
 #include <iostream>
 #include <utils/cloud_helper.hpp>
 #include <utils/json_helper.cpp>
+#include <utils/define.hpp>
 #include <ros/package.h>
 #include <rosbag/bag.h>
 #include <rosbag/view.h>
 #include <opencv2/highgui.hpp>
-
-#define TOPIC "/os1_cloud_node/points"
-#define PACKAGE_NAME "lidarslam"
-#define LIDAR_CONFIG_FILE "/config/lidar.cfg"
 
 using std::cout;
 
@@ -25,7 +22,7 @@ int main(int argc, char **argv) {
   rosbag::Bag bag(argv[1]);
   for (rosbag::MessageInstance const m: rosbag::View(bag)) {
 
-    if (m.getTopic() != TOPIC) continue;
+    if (m.getTopic() != CLOUD_TOPIC) continue;
     sensor_msgs::PointCloud2::ConstPtr cloud_msg = m.instantiate<sensor_msgs::PointCloud2>();
     PointCloud cloud = deserializeCloudMsg(cloud_msg);
     Image img = pointCloud2Img(cloud, projector);

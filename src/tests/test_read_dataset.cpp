@@ -2,8 +2,7 @@
 #include <rosbag/bag.h>
 #include <rosbag/view.h>
 #include <sensor_msgs/PointCloud2.h>
-
-#define TOPIC "/os1_cloud_node/points"
+#include <utils/define.hpp>
 
 using std::cout;
 
@@ -19,12 +18,12 @@ int main(int argc, char **argv) {
   rosbag::Bag bag(argv[1]);
   for (rosbag::MessageInstance const m: rosbag::View(bag)) {
     
-    if (m.getTopic() != TOPIC) continue;
+    if (m.getTopic() != CLOUD_TOPIC) continue;
     sensor_msgs::PointCloud2::ConstPtr cloud_msg = m.instantiate<sensor_msgs::PointCloud2>();  
     count++;
   }
 
-  cout << "The bag file contains " << count << " messages of the topic " << TOPIC << "\n";
+  cout << "The bag file contains " << count << " messages of the topic " << CLOUD_TOPIC << "\n";
 
   bag.close();
   return 0;

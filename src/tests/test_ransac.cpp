@@ -1,10 +1,8 @@
 #include <iostream>
 #include <ros/package.h>
 #include <utils/json_helper.cpp>
+#include <utils/define.hpp>
 #include <core/registrator.hpp>
-
-#define PACKAGE_NAME "lidarslam"
-#define RANSAC_CONFIG_FILE "/config/ransac.cfg"
 
 using std::cout;
 

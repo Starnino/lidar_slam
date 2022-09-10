@@ -25,9 +25,10 @@ PointCloud deserializeCloudMsg(const sensor_msgs::PointCloud2ConstPtr msg) {
 
 template <typename T>
 Eigen::Array<T,-1,1> clamp(Eigen::Array<T,-1,1>& arr, T min, T max) {
-    arr = arr.unaryExpr([&](const T x) { return std::max<T>(min, x); });
-    arr = arr.unaryExpr([&](const T x) { return std::min<T>(max, x); });
-    return arr;
+  arr = arr.round();
+  arr = arr.unaryExpr([&](const T x) { return std::min<T>(max, x); });
+  arr = arr.unaryExpr([&](const T x) { return std::max<T>(min, x); });
+  return arr;
 };
 
 Image pointCloud2Img(PointCloud& cloud, Projector& projector) {
@@ -45,18 +46,17 @@ Image pointCloud2Img(PointCloud& cloud, Projector& projector) {
   ArrayXf radius = Eigen::sqrt(cloud.x().square() + cloud.y().square() + cloud.z().square());
   ArrayXf azimuth = cloud.y().binaryExpr(cloud.x(), [&](const float y, const float x) { return std::atan2(y,x); });
   ArrayXf elevation = Eigen::asin(cloud.z() / radius);
-
+  
   // image projection
-  ArrayXi u = (float(width) / 2.f * (1.f + azimuth / EIGEN_PI)).round().cast<int>();
-  ArrayXi v = (float(height) * (fov_up - elevation) / (fov_up - fov_down))
-    .unaryExpr([&](const float x) { return std::isfinite(x)? x : -1.f; }).round().cast<int>();
+  ArrayXi u = (float(width) * (0.5f * (1.f + azimuth / EIGEN_PI))).round().cast<int>();
+  ArrayXi v = (float(height) * ((fov_up - elevation) / (fov_up - fov_down))).round().cast<int>();
   
   u = clamp(u, 0, width-1);
   v = clamp(v, 0, height-1);
 
   // store depth and intensity into img pixels
   ArrayXf norm_i = cloud.i() / max_intensity * 1.f;
-  ArrayXf norm_d = 1.f - radius / max_depth * 1.f;
+  ArrayXf norm_d = radius / max_depth * 1.f;
   
   #pragma omp parallel for
   for (int i = 0; i < height*width; ++i) {
@@ -68,8 +68,8 @@ Image pointCloud2Img(PointCloud& cloud, Projector& projector) {
     float* dmat_ptr = &(img.depth().at<float>(vi,ui));
     
     // assign point with smallest range
-    if (*imat_ptr == -1.f || *dmat_ptr > depth) {
-      *imat_ptr = intensity;
+    if (*imat_ptr == INV_CV_32F || *dmat_ptr > depth) {
+      *imat_ptr = intensity > 1 ? 1 : intensity;
       *dmat_ptr = depth;
 
       // store 3D point

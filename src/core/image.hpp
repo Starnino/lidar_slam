@@ -7,7 +7,7 @@
 
 #define MIN_CV_32F 0.f
 #define MAX_CV_32F 1.f
-#define INV_CV_32F -1.f
+#define INV_CV_32F -0.1f
 
 using std::vector;
 using std::pair;
@@ -49,7 +49,7 @@ class Image {
       return img;
     }
     inline Vector3f get3DPoint(cv::Point2f& point) {
-      int index = (point.y *_cols + point.x)*3; 
+      int index = (point.y *_cols + point.x)*3;
       return Vector3f(_xyz[index], _xyz[index+1], _xyz[index+2]);
     }
     void drawKeypoints(vector<cv::KeyPoint>& keypoints);

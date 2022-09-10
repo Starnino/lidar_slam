@@ -1,5 +1,5 @@
 #include "tracker.hpp"
-
+#include <iostream>
 Tracker::Tracker(Matcher matcher, float knn_threshold, int norm_threshold) {
   switch (matcher) {
   
@@ -32,28 +32,48 @@ vector<cv::DMatch> Tracker::match(cv::Mat& descriptors1, cv::Mat& descriptors2) 
   return good_matches;
 }
 
-Pointset2f Tracker::update(vector<cv::KeyPoint>& keypoints, cv::Mat& descriptors) {
-  // save descriptors
-  if (_last_descriptors.empty()) {
-    _last_descriptors = descriptors.clone();
-    _last_keypoints = keypoints;
+tuple<Pointset2f,Pointset3f> Tracker::update(vector<cv::KeyPoint>& keypoints, cv::Mat& descriptors, Image& img) {
+  // remove invalid points
+  vector<Point3f> new_points; vector<cv::KeyPoint> new_keypoints; cv::Mat new_descriptors;
+  for (size_t i = 0; i < keypoints.size(); ++i) {
+    Point3f point = img.get3DPoint(keypoints[i].pt);
+    if (point.isZero()) continue;
+    new_points.push_back(point);
+    new_keypoints.push_back(keypoints[i]);
+    new_descriptors.push_back(descriptors.row(i));
+  }
+  
+  if (_last_points.size() < 3) {
+    _last_points = new_points;
+    _last_keypoints = new_keypoints;
+    _last_descriptors = new_descriptors;
     return {};
   }
-  vector<cv::DMatch> matches = match(_last_descriptors, descriptors);
+
+  if (new_points.size() < 3) {
+    return {};
+  }
+
+  vector<cv::DMatch> matches = match(_last_descriptors, new_descriptors);
   
-  Pointset2f correspondeces;
+  Pointset2f correspondeces2D;
+  Pointset3f correspondeces3D;
   for (size_t i = 0; i < matches.size(); ++i) {
-    cv::Point2f query_point = _last_keypoints[matches[i].queryIdx].pt;
-    cv::Point2f train_point = keypoints[matches[i].trainIdx].pt;
+    int query_idx = matches[i].queryIdx;
+    int train_idx = matches[i].trainIdx;
+    cv::Point2f query_point = _last_keypoints[query_idx].pt;
+    cv::Point2f train_point = new_keypoints[train_idx].pt;
     if (cv::norm(query_point-train_point) < _norm_threshold) {
-      correspondeces.push_back({query_point, train_point});
+      correspondeces2D.push_back({query_point, train_point});
+      correspondeces3D.push_back({_last_points[query_idx], new_points[train_idx]});
     }
   }
 
-  _last_descriptors = descriptors.clone();
-  _last_keypoints = keypoints;
+  _last_points = new_points;
+  _last_keypoints = new_keypoints;
+  _last_descriptors = new_descriptors;
   
-  return correspondeces; 
+  return {correspondeces2D, correspondeces3D}; 
 }
 
 unordered_map<int,pair<vector<cv::Point2f>,cv::Scalar>> Tracker::updateTracks(vector<cv::KeyPoint>& keypoints, cv::Mat& descriptors) {
@@ -101,8 +121,6 @@ unordered_map<int,pair<vector<cv::Point2f>,cv::Scalar>> Tracker::updateTracks(ve
       unmatched_descriptors.pop_back();
     }
   }
-
-  _last_descriptors = new_descriptors.clone();
   
   // eliminate ending tracks
   for (auto& track : _tracks) {
@@ -110,6 +128,8 @@ unordered_map<int,pair<vector<cv::Point2f>,cv::Scalar>> Tracker::updateTracks(ve
       track.second.first.clear();
     }
   }
+
+  _last_descriptors = new_descriptors.clone();
 
   return _tracks;
 }

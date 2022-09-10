@@ -19,18 +19,18 @@ int main(int argc, char **argv) {
   cout << gt_pose.matrix().affine() << "\n\n";
 
   Pointset3f set;
-  // generate random points with correct association
-  for (int i = 0; i < 30; ++i) {
+  // generate random points with correct association (addiong some noise)
+  for (int i = 0; i < 50; ++i) {
     Point3f point = Point3f::Random()*10;
-    set.push_back({point, (R*point + t)  + Point3f::Random()});
+    set.push_back({point, gt_pose*point  + Point3f::Random()*0.05f});
   }
   // generate random points with wrong associations
-  for (int i = 0; i < 10; ++i) {
+  for (int i = 0; i < 50; ++i) {
     set.push_back({Point3f::Random()*10, Point3f::Random()*10});
   }
   Points points(set);
 
-  Model<Pointset3f>* model = RANSAC<Pose,Pointset3f>(points, ransac_iterations, inliers_threshold, 3);
+  auto [_, model] = RANSAC<Pose,Pointset3f>(points, ransac_iterations, inliers_threshold, 3);
   Pose pose = *(static_cast<Pose*>(model));
   
   cout << "Estimated pose\n";

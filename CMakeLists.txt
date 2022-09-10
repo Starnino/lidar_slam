@@ -11,7 +11,7 @@ add_compile_options(-msse2)
 add_compile_options(-Wall)
 
 ## Find catkin macros and libraries
-find_package(catkin REQUIRED COMPONENTS roscpp sensor_msgs rosbag)
+find_package(catkin REQUIRED COMPONENTS roscpp sensor_msgs rosbag message_filters)
 message("${PROJECT_NAME}|ROS components found in ${catkin_INCLUDE_DIRS}")
 
 ## Find Eigen
@@ -38,6 +38,12 @@ message("${PROJECT_NAME}|Torch headers in (${TORCH_INCLUDE_DIRS})")
 message("${PROJECT_NAME}|Torch libraries in (${TORCH_LIBRARIES})")
 add_compile_options(${TORCH_CXX_FLAGS})
 
+# find python libraries
+find_package(Python3 COMPONENTS Interpreter Development REQUIRED)
+find_package(PythonLibs 3.0 REQUIRED)
+message("${PROJECT_NAME}|Python libraries in (${PYTHON_LIBRARIES})")
+message("${PYTHON_INCLUDE_DIRS}")
+
 ## catkin specific configuration
 ## INCLUDE_DIRS: uncomment this if your package contains header files
 ## LIBRARIES: libraries you create in this project that dependent projects also need
@@ -56,7 +62,8 @@ include_directories(
     ${OpenCV_INCLUDE_DIRS}
     ${JSONCPP_INCLUDE_DIRS}
     ${TORCH_INCLUDE_DIRS}
-    ${PROJECT_SOURCE_DIR}/src)   
+    ${PROJECT_SOURCE_DIR}/src
+    ${PYTHON_INCLUDE_DIRS})   
 
 ## Link CMakeLists files recursively
 add_subdirectory(${PROJECT_SOURCE_DIR}/src)

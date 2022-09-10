@@ -32,7 +32,7 @@ cv::Mat Image::drawMatches(Image& img1, Image& img2, Pointset2f& matches, vector
   cv::Size size(img2.size().width, img2.size().height*2);
   cv::Mat color_img = cv::Mat::zeros(size, CV_32F);
 
-  if (!(img1.empty() || img2.empty())) {
+  if (!(img1.empty() || img2.empty() || inliers_mask.size() == 0)) {
     cv::Mat img = cv::Mat::zeros(size, CV_32F);
     cv::vconcat(img1.intensity(), img2.intensity(), img);
     cv::cvtColor(img, color_img, cv::COLOR_GRAY2RGB);

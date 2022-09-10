@@ -26,34 +26,27 @@ struct Points : Data<Pointset3f> {
 };
 
 struct Pose : Model<Pointset3f> {
-  Matrix3f _rotation;
-  Vector3f _translation;
+  Affine3f _matrix;
   Pointset3f _inliers;
   vector<bool> _mask;
   
   explicit Pose() { 
-    _rotation = Matrix3f::Identity();
-    _translation = Vector3f::Zero();
+    _matrix = Affine3f::Identity();
+  }
+  explicit Pose(Affine3f matrix) {
+    _matrix = matrix;
   }
   explicit Pose(Matrix3f rotation, Vector3f translation) {
-    _rotation = rotation;
-    _translation = translation;
+    Affine3f a(rotation);
+    a.translation() = translation;
+    _matrix = a;
   }
-  inline const Matrix3f& rotation() const { return _rotation; }
-  inline const Vector3f& translation() const { return _translation; }
+  inline const Affine3f matrix() const {return _matrix;}
   inline const Pointset3f& inliers() const { return _inliers; }
   inline const vector<bool> mask() const { return _mask; }
-  inline Pose operator*(const Pose& other) {
-      Matrix3f R = rotation()*other.rotation();
-      Vector3f t = rotation()*other.translation() + translation();
-      return Pose(R,t); 
-  }
-  inline Affine3f matrix() {
-    Affine3f matrix(_rotation);
-    matrix.translation() = _translation;
-    return matrix;
-  }
-  inline Point3f predict(Point3f& point) { return rotation()*point + translation(); }
+  inline Pose operator*(const Pose& other) { return Pose(matrix()*other.matrix()); }
+  inline Point3f operator*(const Point3f& point) { return matrix()*point; }
+  inline Point3f predict(Point3f& point) { return matrix()*point; }
 
   void fit(Pointset3f& points) override;
   int evaluate(Data<Pointset3f>& points, float inlier_threshold) override;
@@ -69,10 +62,12 @@ class Registrator {
 
   public:
     inline explicit Registrator(int ransac_iterations, float inliers_threshold) {
-      srand(0);
+      srand(time(NULL));
       _ransac_iterations = ransac_iterations;
       _inliers_threshold = inliers_threshold;
     }
 
-    tuple<Affine3f,Pointset3f,vector<bool>> registerPoints(Pointset3f& points);
+    static Affine3f computeAlignment(const Pointset3f& pointset);
+    tuple<bool, Affine3f> registerPoints(Pointset3f& points);
+    tuple<Affine3f,Pointset3f,vector<bool>> registerPoints2(Pointset3f& points);
 };

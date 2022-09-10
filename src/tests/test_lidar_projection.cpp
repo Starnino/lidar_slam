@@ -30,7 +30,9 @@ int main(int argc, char **argv) {
     cv::imshow("Intensity", img.intensity());   
     cv::waitKey(1);
     cv::imshow("Depth", img.depth());
-    cv::waitKey(1); 
+    cv::waitKey(1);
+
+    break;
   }
   
   bag.close();

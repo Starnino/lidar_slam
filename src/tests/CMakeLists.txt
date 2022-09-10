@@ -11,7 +11,15 @@ add_executable(test_superpoint_tracking test_superpoint_tracking.cpp)
 target_link_libraries(test_superpoint_tracking core utils ${OpenCV_LIBS} ${catkin_LIBRARIES} ${TORCH_LIBRARIES})
 
 add_executable(test_ransac test_ransac.cpp)
-target_link_libraries(test_ransac core utils ${catkin_LIBRARIES})
+target_link_libraries(test_ransac utils ${catkin_LIBRARIES})
 
 add_executable(test_cloud_registration test_cloud_registration.cpp)
 target_link_libraries(test_cloud_registration core utils ${OpenCV_LIBS} ${catkin_LIBRARIES} ${TORCH_LIBRARIES})
+
+add_executable(test_lidar_trajectory test_lidar_trajectory.cpp)
+set_source_files_properties(test_lidar_trajectory.cpp PROPERTIES COMPILE_FLAGS "-DWITHOUT_NUMPY" )
+target_link_libraries(test_lidar_trajectory core utils ${OpenCV_LIBS} ${catkin_LIBRARIES} ${TORCH_LIBRARIES} ${PYTHON_LIBRARIES})
+
+add_executable(test_gps_trajectory test_gps_trajectory.cpp)
+set_source_files_properties(test_gps_trajectory.cpp PROPERTIES COMPILE_FLAGS "-DWITHOUT_NUMPY" )
+target_link_libraries(test_gps_trajectory utils ${catkin_LIBRARIES} ${PYTHON_LIBRARIES})

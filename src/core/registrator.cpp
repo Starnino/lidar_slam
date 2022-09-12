@@ -15,7 +15,7 @@ Pointset3f Points::randomSelect(int n) {
 
 void Pose::fit(Pointset3f& points) {
   Affine3f sol = Registrator::computeAlignment(points);
-  _matrix = sol;
+  _transform = sol;
   _inliers.clear();
   _mask.clear();
 }
@@ -75,26 +75,15 @@ Affine3f Registrator::computeAlignment(const Pointset3f& pointset) {
   return sol;
 }
 
-tuple<bool,Affine3f> Registrator::registerPoints(Pointset3f& pointset) {
+tuple<bool,Pose> Registrator::registerPoints(Pointset3f& pointset) {
   if (pointset.size() != 0) {
     Points points(pointset);
     auto [found, model] = RANSAC<Pose,Pointset3f>(points, _ransac_iterations, _inliers_threshold, 3);
     if (found) {
       Pose pose = *(static_cast<Pose*>(model));
-      return {true, computeAlignment(pose.inliers())};
+      pose.setTransform(computeAlignment(pose.inliers()));
+      return {true, pose};
     }
   }
-  return {false, {}};
-}
-
-tuple<Affine3f,Pointset3f,vector<bool>> Registrator::registerPoints2(Pointset3f& pointset) {
-  if (pointset.size() != 0) {
-    Points points(pointset);
-    auto [found, model] = RANSAC<Pose,Pointset3f>(points, _ransac_iterations, _inliers_threshold, 3);
-    if (found) {
-      Pose pose = *(static_cast<Pose*>(model));
-      return {computeAlignment(pose.inliers()), pose.inliers(), pose.mask()};
-    }
-  }
-  return {Affine3f::Identity(), {}, {}};
+  return {false, Pose()};
 }

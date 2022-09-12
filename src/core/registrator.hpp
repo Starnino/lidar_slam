@@ -26,27 +26,31 @@ struct Points : Data<Pointset3f> {
 };
 
 struct Pose : Model<Pointset3f> {
-  Affine3f _matrix;
+  Affine3f _transform;
   Pointset3f _inliers;
   vector<bool> _mask;
   
   explicit Pose() { 
-    _matrix = Affine3f::Identity();
+    _transform = Affine3f::Identity();
   }
-  explicit Pose(Affine3f matrix) {
-    _matrix = matrix;
+  explicit Pose(Affine3f transform) {
+    _transform = transform;
   }
   explicit Pose(Matrix3f rotation, Vector3f translation) {
     Affine3f a(rotation);
     a.translation() = translation;
-    _matrix = a;
+    _transform = a;
   }
-  inline const Affine3f matrix() const {return _matrix;}
-  inline const Pointset3f& inliers() const { return _inliers; }
+  inline const Affine3f& transform() const {return _transform; }
+  inline const float transform(int r, int c) const {return _transform(r,c); }
+  inline void setTransform(Affine3f transform){ _transform = transform; }
+  inline const Vector3f translation() const {return _transform.translation(); }
+  inline const Matrix3f rotation() const {return _transform.rotation(); }
+  inline const Pointset3f& inliers() const { return _inliers; } 
   inline const vector<bool> mask() const { return _mask; }
-  inline Pose operator*(const Pose& other) { return Pose(matrix()*other.matrix()); }
-  inline Point3f operator*(const Point3f& point) { return matrix()*point; }
-  inline Point3f predict(Point3f& point) { return matrix()*point; }
+  inline Pose operator*(const Pose& other) { return Pose(transform()*other.transform()); }
+  inline Point3f operator*(const Point3f& point) { return transform()*point; }
+  inline Point3f predict(Point3f& point) { return transform()*point; }
 
   void fit(Pointset3f& points) override;
   int evaluate(Data<Pointset3f>& points, float inlier_threshold) override;
@@ -68,6 +72,5 @@ class Registrator {
     }
 
     static Affine3f computeAlignment(const Pointset3f& pointset);
-    tuple<bool, Affine3f> registerPoints(Pointset3f& points);
-    tuple<Affine3f,Pointset3f,vector<bool>> registerPoints2(Pointset3f& points);
+    tuple<bool, Pose> registerPoints(Pointset3f& points);
 };

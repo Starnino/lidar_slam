@@ -15,7 +15,7 @@ using std::tuple;
 using Pointset2f = vector<pair<cv::Point2f,cv::Point2f>>;
 using Descriptor = Eigen::VectorXf;
 
-enum class Matcher {BFMatcher, FLANNMatcher};
+enum class Matcher {BFMatcher, FLANNMatcher, };
 
 class Tracker {
 
@@ -27,10 +27,10 @@ class Tracker {
     vector<cv::KeyPoint> _last_keypoints;
     vector<Point3f> _last_points;
     unordered_map<int, pair<vector<cv::Point2f>,cv::Scalar>> _tracks;
-    vector<cv::DMatch> match(cv::Mat& descriptors1, cv::Mat& descriptors2);
+    vector<cv::DMatch> knnmatch(cv::Mat& descriptors1, cv::Mat& descriptors2);
 
   public:
-    explicit Tracker(Matcher matcher, float knn_threshold, int norm_threshold);
+    explicit Tracker(Matcher matcher, float knn_threshold, int norm_threshold, int norm_type);
 
     tuple<Pointset2f,Pointset3f> update(vector<cv::KeyPoint>& keypoints, cv::Mat& descriptors, Image& img);
     unordered_map<int,pair<vector<cv::Point2f>,cv::Scalar>> updateTracks(vector<cv::KeyPoint>& keypoints, cv::Mat& descriptors);

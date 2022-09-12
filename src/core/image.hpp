@@ -25,6 +25,7 @@ class Image {
     int _cols;
     cv::Mat _intensity;
     cv::Mat _depth;
+    int _type;
     ArrayXf _xyz;
 
   public:
@@ -36,6 +37,7 @@ class Image {
     inline cv::Mat& intensity() { return _intensity; }
     inline cv::Mat& depth() { return _depth; }
     inline const ArrayXf& xyz() { return _xyz; }
+    inline const int& type() { return _type; }
     inline float& xyz(int index) { return _xyz[index]; }
     inline const cv::Size size() { return _intensity.size(); }
     inline bool empty() { return _intensity.empty() || _depth.empty(); }
@@ -46,13 +48,15 @@ class Image {
       img._intensity = _intensity.clone();
       img._depth = _depth.clone();
       img._xyz = _xyz;
+      img._type = _type;
       return img;
     }
     inline Vector3f get3DPoint(cv::Point2f& point) {
       int index = (point.y *_cols + point.x)*3;
       return Vector3f(_xyz[index], _xyz[index+1], _xyz[index+2]);
     }
+    Image& convertToCV8U();
     void drawKeypoints(vector<cv::KeyPoint>& keypoints);
     void drawTracks(unordered_map<int,pair<vector<cv::Point2f>,cv::Scalar>>& tracks);
-    static cv::Mat drawMatches(Image& img1, Image& img2, Pointset2f& matches, vector<bool>& inliers_mask);
+    static cv::Mat drawMatches(Image& img1, Image& img2, const Pointset2f& matches, const vector<bool>& inliers_mask);
 };

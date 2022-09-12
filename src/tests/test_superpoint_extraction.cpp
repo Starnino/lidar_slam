@@ -6,6 +6,7 @@
 #include <rosbag/bag.h>
 #include <rosbag/view.h>
 #include <opencv2/highgui.hpp>
+#include <opencv2/features2d.hpp>
 
 using std::cout;
 
@@ -19,24 +20,21 @@ int main(int argc, char **argv) {
   string path = ros::package::getPath(PACKAGE_NAME);
   
   Projector projector = json::loadProjectorConfig(path + LIDAR_CONFIG_FILE);
-  SuperPointDetector superpoint = json::loadSuperPointConfig(path, SUPERPOINT_CONFIG_FILE);
-
+  //SuperPointDetector superpoint = json::loadSuperPointConfig(path, DETECTOR_CONFIG_FILE);
+  cv::Ptr<cv::FeatureDetector> detector = json::loadORBConfig(path + DETECTOR_CONFIG_FILE);
   rosbag::Bag bag(argv[1]);
   for (rosbag::MessageInstance const m: rosbag::View(bag)) {
-
     if (m.getTopic() != CLOUD_TOPIC) continue;
+
     sensor_msgs::PointCloud2::ConstPtr cloud_msg = m.instantiate<sensor_msgs::PointCloud2>();
     PointCloud cloud = deserializeCloudMsg(cloud_msg);
-    Image img = pointCloud2Img(cloud, projector);
+    Image img = pointCloud2Img(cloud, projector).convertToCV8U();
 
     vector<cv::KeyPoint> keypoints;
-    superpoint.detect(img.intensity(), keypoints);
+    detector->detect(img.intensity(), keypoints);
     
-    Image detection(cloud.h(), cloud.w());
-    cv::cvtColor(img.intensity(), detection.intensity(), cv::COLOR_GRAY2RGB);
-    detection.drawKeypoints(keypoints);
-
-    cv::imshow("Feature Detection", detection.intensity());   
+    img.drawKeypoints(keypoints);
+    cv::imshow("Feature Detection", img.intensity());  
     cv::waitKey(1);
   }
   

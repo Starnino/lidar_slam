@@ -25,8 +25,8 @@ int main(int argc, char **argv) {
   
   rosbag::Bag bag(argv[1]);
   for (rosbag::MessageInstance const m: rosbag::View(bag)) {
-    
     if (m.getTopic() != GPS_TOPIC) continue;
+    
     sensor_msgs::NavSatFix::ConstPtr gps_msg = m.instantiate<sensor_msgs::NavSatFix>();
     double latitude = gps_msg->latitude;
     double longitude = gps_msg->longitude;

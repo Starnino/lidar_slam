@@ -15,7 +15,7 @@ int main(int argc, char **argv) {
   string path = ros::package::getPath(PACKAGE_NAME);
   
   Projector projector = json::loadProjectorConfig(path + LIDAR_CONFIG_FILE);
-  SuperPointDetector superpoint = json::loadSuperPointConfig(path, SUPERPOINT_CONFIG_FILE);
+  SuperPointDetector superpoint = json::loadSuperPointConfig(path, DETECTOR_CONFIG_FILE);
 
   auto cloud_handler = [&](const sensor_msgs::PointCloud2::ConstPtr& cloud_msg) {
     PointCloud cloud = deserializeCloudMsg(cloud_msg);

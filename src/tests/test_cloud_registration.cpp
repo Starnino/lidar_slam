@@ -20,8 +20,8 @@ int main(int argc, char **argv) {
   string path = ros::package::getPath(PACKAGE_NAME);
   
   Projector projector = json::loadProjectorConfig(path + LIDAR_CONFIG_FILE);
-  SuperPointDetector superpoint = json::loadSuperPointConfig(path, SUPERPOINT_CONFIG_FILE);
-  Tracker tracker = json::loadMatchConfig(Matcher::BFMatcher, path + MATCH_CONFIG_FILE);
+  SuperPointDetector superpoint = json::loadSuperPointConfig(path, DETECTOR_CONFIG_FILE);
+  Tracker tracker = json::loadMatchConfig(path + MATCH_CONFIG_FILE);
   auto [ransac_iterations, inliers_threshold] = json::loadRANSACConfig(path + RANSAC_CONFIG_FILE);
   Registrator registrator = Registrator(ransac_iterations, inliers_threshold);
   Image last_img;
@@ -36,18 +36,17 @@ int main(int argc, char **argv) {
     
     vector<cv::KeyPoint> keypoints; cv::Mat descriptors;
     superpoint.detectAndCompute(img.intensity(), keypoints, descriptors);
-
     auto [matches2D, matches3D] = tracker.update(keypoints, descriptors, img);
-    auto [transform, inliers, mask] = registrator.registerPoints2(matches3D);
+    auto [found, pose] = registrator.registerPoints(matches3D);
     
-    if (abs(transform(0,0)) > 10.f || abs(transform(1,3)) > 10.f) {
+    if (abs(pose.transform(0,0)) > 10.f || abs(pose.transform(1,3)) > 10.f) {
       cout << "Anomalous Transform\n";
-      cout << transform.affine() << "\n";
-      cout << "point matches = " << matches3D.size() << "\ninliers = " << inliers.size() << "\n";
+      cout << pose.transform().affine() << "\n";
+      cout << "point matches = " << matches3D.size() << "\ninliers = " << pose.inliers().size() << "\n";
       break;
     } 
 
-    cv::Mat registered_img = Image::drawMatches(last_img, img, matches2D, mask);
+    cv::Mat registered_img = Image::drawMatches(last_img, img, matches2D, pose.mask());
     last_img = img.clone();
     
     cv::imshow("Feature Detection", registered_img);

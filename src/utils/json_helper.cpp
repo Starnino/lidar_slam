@@ -29,6 +29,22 @@ SuperPointDetector json::loadSuperPointConfig(string path, string config_filenam
   return SuperPointDetector(-1, threshold, nms_dist, false, path + weights_file);
 }
 
+cv::Ptr<cv::FeatureDetector> json::loadORBConfig(string path) {
+  Json::Reader reader;
+  Json::Value cfg;
+  std::ifstream file(path);
+  reader.parse(file, cfg);
+
+  int nfeatures = cfg["ORB"]["nfeatures"].asInt();
+  float scale = cfg["ORB"]["scale"].asFloat();
+  int nlevels = cfg["ORB"]["nlevels"].asInt();
+  int edge_threshold = cfg["ORB"]["edge_threshold"].asInt();
+  int patch_size = cfg["ORB"]["patch_size"].asInt();
+  int fast_threshold = cfg["ORB"]["fast_threshold"].asInt();
+
+  return cv::ORB::create(nfeatures, scale, nlevels, edge_threshold, 0, 2, cv::ORB::HARRIS_SCORE, patch_size, fast_threshold);
+}
+
 tuple<int,float> json::loadRANSACConfig(string path) {
   Json::Reader reader;
   Json::Value cfg;
@@ -41,14 +57,17 @@ tuple<int,float> json::loadRANSACConfig(string path) {
   return {iterations, inliers_threshold};
 }
 
-Tracker json::loadMatchConfig(Matcher matcher, string path) {
+Tracker json::loadMatchConfig(string path) {
   Json::Reader reader;
   Json::Value cfg;
   std::ifstream file(path);
   reader.parse(file, cfg);
 
+  string type = cfg["Matcher"]["type"].asString();
+  Matcher matcher = type == "brute-force" ? Matcher::BFMatcher : Matcher::FLANNMatcher;
   float knn_threshold = cfg["Matcher"]["knn_threshold"].asFloat();
   int norm_threshold = cfg["Matcher"]["norm_threshold"].asInt();
+  int norm_type = cfg["Matcher"]["norm_type"].asInt();
 
-  return Tracker(matcher, knn_threshold, norm_threshold);
+  return Tracker(matcher, knn_threshold, norm_threshold, norm_type);
 }

@@ -19,12 +19,12 @@ int main(int argc, char **argv) {
   string path = ros::package::getPath(PACKAGE_NAME);
   
   Projector projector = json::loadProjectorConfig(path + LIDAR_CONFIG_FILE);
-  SuperPointDetector superpoint = json::loadSuperPointConfig(path, SUPERPOINT_CONFIG_FILE);
-  Tracker tracker = json::loadMatchConfig(Matcher::BFMatcher, path + MATCH_CONFIG_FILE);
+  SuperPointDetector superpoint = json::loadSuperPointConfig(path, DETECTOR_CONFIG_FILE);
+  Tracker tracker = json::loadMatchConfig(path + MATCH_CONFIG_FILE);
   auto [ransac_iterations, inliers_threshold] = json::loadRANSACConfig(path + RANSAC_CONFIG_FILE);
   Registrator registrator = Registrator(ransac_iterations, inliers_threshold);
 
-  Affine3f pose = Affine3f::Identity();
+  Pose pose;
   
   auto cloud_handler = [&](const sensor_msgs::PointCloud2::ConstPtr& cloud_msg) {
     PointCloud cloud = deserializeCloudMsg(cloud_msg);

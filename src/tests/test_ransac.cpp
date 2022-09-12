@@ -16,7 +16,7 @@ int main(int argc, char **argv) {
   Vector3f t{1, 2, 0};
   Pose gt_pose = Pose(R,t);
   cout << "Ground Thruth pose\n";
-  cout << gt_pose.matrix().affine() << "\n\n";
+  cout << gt_pose.transform().affine() << "\n\n";
 
   Pointset3f set;
   // generate random points with correct association (addiong some noise)
@@ -34,7 +34,7 @@ int main(int argc, char **argv) {
   Pose pose = *(static_cast<Pose*>(model));
   
   cout << "Estimated pose\n";
-  cout << pose.matrix().affine() << "\n";
+  cout << pose.transform().affine() << "\n";
   cout << "\nNumber of inliers = " << pose.inliers().size() << "\n";
   return 0;
 }

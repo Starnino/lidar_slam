@@ -19,8 +19,8 @@ int main(int argc, char **argv) {
   string path = ros::package::getPath(PACKAGE_NAME);
   
   Projector projector = json::loadProjectorConfig(path + LIDAR_CONFIG_FILE);
-  SuperPointDetector superpoint = json::loadSuperPointConfig(path, SUPERPOINT_CONFIG_FILE);
-  Tracker tracker = json::loadMatchConfig(Matcher::BFMatcher, path + MATCH_CONFIG_FILE);
+  SuperPointDetector superpoint = json::loadSuperPointConfig(path, DETECTOR_CONFIG_FILE);
+  Tracker tracker = json::loadMatchConfig(path + MATCH_CONFIG_FILE);
 
   rosbag::Bag bag(argv[1]);
   for (rosbag::MessageInstance const m: rosbag::View(bag)) {
@@ -32,14 +32,10 @@ int main(int argc, char **argv) {
 
     vector<cv::KeyPoint> keypoints; cv::Mat descriptors;
     superpoint.detectAndCompute(img.intensity(), keypoints, descriptors);
-
     auto tracks = tracker.updateTracks(keypoints, descriptors);
     
-    Image detection(cloud.h(), cloud.w());
-    cv::cvtColor(img.intensity(), detection.intensity(), cv::COLOR_GRAY2RGB);
-    detection.drawTracks(tracks);
-  
-    cv::imshow("Feature Detection", detection.intensity());
+    img.drawTracks(tracks);  
+    cv::imshow("Feature Detection", img.intensity());
     cv::waitKey(1);
   }
   

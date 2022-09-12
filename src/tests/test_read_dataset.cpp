@@ -17,8 +17,8 @@ int main(int argc, char **argv) {
 
   rosbag::Bag bag(argv[1]);
   for (rosbag::MessageInstance const m: rosbag::View(bag)) {
-    
     if (m.getTopic() != CLOUD_TOPIC) continue;
+    
     sensor_msgs::PointCloud2::ConstPtr cloud_msg = m.instantiate<sensor_msgs::PointCloud2>();  
     count++;
   }

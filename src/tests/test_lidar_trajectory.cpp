@@ -22,32 +22,32 @@ int main(int argc, char **argv) {
   string path = ros::package::getPath(PACKAGE_NAME);
   
   Projector projector = json::loadProjectorConfig(path + LIDAR_CONFIG_FILE);
-  SuperPointDetector superpoint = json::loadSuperPointConfig(path, SUPERPOINT_CONFIG_FILE);
-  Tracker tracker = json::loadMatchConfig(Matcher::BFMatcher, path + MATCH_CONFIG_FILE);
+  SuperPointDetector superpoint = json::loadSuperPointConfig(path, DETECTOR_CONFIG_FILE);
+  Tracker tracker = json::loadMatchConfig(path + MATCH_CONFIG_FILE);
   auto [ransac_iterations, inliers_threshold] = json::loadRANSACConfig(path + RANSAC_CONFIG_FILE);
   Registrator registrator = Registrator(ransac_iterations, inliers_threshold);
 
-  Affine3f pose = Affine3f::Identity();
+  Pose pose;
   vector<float> x_lidar; vector<float> y_lidar;
   
   rosbag::Bag bag(argv[1]);
   for (rosbag::MessageInstance const m: rosbag::View(bag)) {
-    
     if (m.getTopic() != CLOUD_TOPIC) continue;
+    
     sensor_msgs::PointCloud2::ConstPtr cloud_msg = m.instantiate<sensor_msgs::PointCloud2>();
     PointCloud cloud = deserializeCloudMsg(cloud_msg);
     Image img = pointCloud2Img(cloud, projector);
     
-    vector<cv::KeyPoint> keypoints; cv::Mat descriptors;
+    cv::Mat mat; vector<cv::KeyPoint> keypoints; cv::Mat descriptors;
+    cv::cvtColor(img.intensity(), mat, cv::COLOR_GRAY2RGB);
     superpoint.detectAndCompute(img.intensity(), keypoints, descriptors);
-    
     Pointset3f matches = std::get<1>(tracker.update(keypoints, descriptors, img));
     auto [found, transform] = registrator.registerPoints(matches);
     
     if (found) {
       pose = pose*transform;
-      x_lidar.push_back(pose.translation()[0]);
-      y_lidar.push_back(pose.translation()[1]);
+      x_lidar.push_back(pose.translation().x());
+      y_lidar.push_back(pose.translation().y());
     }
   }
   bag.close();

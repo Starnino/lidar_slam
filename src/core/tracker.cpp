@@ -1,10 +1,10 @@
 #include "tracker.hpp"
-#include <iostream>
-Tracker::Tracker(Matcher matcher, float knn_threshold, int norm_threshold) {
+
+Tracker::Tracker(Matcher matcher, float knn_threshold, int norm_threshold, int norm_type) {
   switch (matcher) {
   
   case Matcher::BFMatcher:
-    _matcher = cv::BFMatcher::create();
+    _matcher = cv::BFMatcher::create(norm_type);
     break;
   
   case Matcher::FLANNMatcher:
@@ -16,11 +16,12 @@ Tracker::Tracker(Matcher matcher, float knn_threshold, int norm_threshold) {
   _norm_threshold = norm_threshold;
 }
 
-vector<cv::DMatch> Tracker::match(cv::Mat& descriptors1, cv::Mat& descriptors2) {
+vector<cv::DMatch> Tracker::knnmatch(cv::Mat& descriptors1, cv::Mat& descriptors2) {
   assert(descriptors1.cols == descriptors2.cols);
   
   vector<vector<cv::DMatch>> knn_matches;
   vector<cv::DMatch> good_matches;
+
   _matcher->knnMatch(descriptors1, descriptors2, knn_matches, 2);
 
   for (size_t i = 0; i < knn_matches.size(); ++i) {
@@ -28,7 +29,7 @@ vector<cv::DMatch> Tracker::match(cv::Mat& descriptors1, cv::Mat& descriptors2) 
       good_matches.push_back(knn_matches[i][0]);
     }
   }
-
+ 
   return good_matches;
 }
 
@@ -54,7 +55,7 @@ tuple<Pointset2f,Pointset3f> Tracker::update(vector<cv::KeyPoint>& keypoints, cv
     return {};
   }
 
-  vector<cv::DMatch> matches = match(_last_descriptors, new_descriptors);
+  vector<cv::DMatch> matches = knnmatch(_last_descriptors, new_descriptors);
   
   Pointset2f correspondeces2D;
   Pointset3f correspondeces3D;
@@ -92,8 +93,8 @@ unordered_map<int,pair<vector<cv::Point2f>,cv::Scalar>> Tracker::updateTracks(ve
   }
   
   // update tracks
-  vector<cv::DMatch> matches = match(_last_descriptors, descriptors);
-  cv::Mat new_descriptors(_last_descriptors.size(), CV_32FC1, cv::Scalar(10.f));
+  vector<cv::DMatch> matches = knnmatch(_last_descriptors, descriptors);
+  cv::Mat new_descriptors(_last_descriptors.size(), _last_descriptors.type());
   vector<cv::Mat> unmatched_descriptors;
   vector<int> last_mask(_last_descriptors.size().height, 1);
   vector<int> new_mask(descriptors.size().height, 1);
@@ -128,7 +129,7 @@ unordered_map<int,pair<vector<cv::Point2f>,cv::Scalar>> Tracker::updateTracks(ve
       track.second.first.clear();
     }
   }
-
+  
   _last_descriptors = new_descriptors.clone();
 
   return _tracks;

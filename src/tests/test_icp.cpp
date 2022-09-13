@@ -2,21 +2,22 @@
 #include <ros/package.h>
 #include <utils/json_helper.cpp>
 #include <utils/define.hpp>
-#include <utils/ransac.hpp>
+#include <utils/icp.hpp>
 
 using std::cout;
 
 int main(int argc, char **argv) {
-  srand(time(0));
+  srand(time(NULL));
   string path = ros::package::getPath(PACKAGE_NAME);
-  auto [ransac_iterations, inliers_threshold] = json::loadRANSACConfig(path + RANSAC_CONFIG_FILE);
+  auto [iterations, kernel_threshold, damping, inliers_threshold] = json::loadICPConfig(path + ICP_CONFIG_FILE);
 
   // random rotation matrix
   Matrix3f R = Eigen::Quaternionf::UnitRandom().toRotationMatrix();
   Vector3f t{1, 2, 0};
-  Pose gt_pose = Pose(R,t);
+  Affine3f gt_pose(R);
+  gt_pose.translation() = t;
   cout << "Ground Thruth pose\n";
-  cout << gt_pose.transform().affine() << "\n\n";
+  cout << gt_pose.affine() << "\n\n";
 
   Pointset3f set;
   // generate random points with correct association (addiong some noise)
@@ -29,8 +30,9 @@ int main(int argc, char **argv) {
     set.push_back({Point3f::Random()*10, Point3f::Random()*10});
   }
 
-  auto [_, pose] = RANSAC(set, ransac_iterations, inliers_threshold, 3);
-  
+  Pose pose(ICP(Affine3f::Identity(), set, iterations, kernel_threshold, damping));
+  pose.evaluate(set, inliers_threshold);
+
   cout << "Estimated pose\n";
   cout << pose.transform().affine() << "\n";
   cout << "\nNumber of inliers = " << pose.inliers().size() << "\n";

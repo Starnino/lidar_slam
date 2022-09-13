@@ -8,4 +8,5 @@
 #define LIDAR_CONFIG_FILE "/config/lidar.cfg"
 #define DETECTOR_CONFIG_FILE "/config/detector.cfg"
 #define RANSAC_CONFIG_FILE "/config/ransac.cfg"
+#define ICP_CONFIG_FILE "/config/icp.cfg"
 #define MATCH_CONFIG_FILE "/config/match.cfg"

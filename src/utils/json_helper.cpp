@@ -1,6 +1,6 @@
 #include "json_helper.hpp"
 
-Projector json::loadProjectorConfig(string path) {
+tuple<int,int,float,float,float,float> json::loadProjectorConfig(string path) {
   Json::Reader reader;
   Json::Value cfg;
   std::ifstream file(path);
@@ -13,23 +13,23 @@ Projector json::loadProjectorConfig(string path) {
   float max_depth = cfg["Os1Lidar"]["max_depth"].asFloat();
   float max_intensity = cfg["Os1Lidar"]["max_intensity"].asFloat();
 
-  return Projector(height, width, fov_up, fov_down, max_depth, max_intensity);
+  return {height, width, fov_up, fov_down, max_depth, max_intensity};
 }
 
-SuperPointDetector json::loadSuperPointConfig(string path, string config_filename) {
+tuple<float,float,string> json::loadSuperPointConfig(string path, string config_filename) {
   Json::Reader reader;
   Json::Value cfg;
   std::ifstream file(path + config_filename);
   reader.parse(file, cfg);
 
-  string weights_file = cfg["SuperPoint"]["weights_file"].asString();
   float threshold = cfg["SuperPoint"]["threshold"].asFloat();
   float nms_dist = cfg["SuperPoint"]["nms_dist"].asFloat();
+  string weights_file = cfg["SuperPoint"]["weights_file"].asString();
 
-  return SuperPointDetector(-1, threshold, nms_dist, false, path + weights_file);
+  return {threshold, nms_dist, weights_file};
 }
 
-cv::Ptr<cv::FeatureDetector> json::loadORBConfig(string path) {
+tuple<int,float,int,int,int,int> json::loadORBConfig(string path) {
   Json::Reader reader;
   Json::Value cfg;
   std::ifstream file(path);
@@ -42,7 +42,7 @@ cv::Ptr<cv::FeatureDetector> json::loadORBConfig(string path) {
   int patch_size = cfg["ORB"]["patch_size"].asInt();
   int fast_threshold = cfg["ORB"]["fast_threshold"].asInt();
 
-  return cv::ORB::create(nfeatures, scale, nlevels, edge_threshold, 0, 2, cv::ORB::HARRIS_SCORE, patch_size, fast_threshold);
+  return {nfeatures, scale, nlevels, edge_threshold, patch_size, fast_threshold};
 }
 
 tuple<int,float> json::loadRANSACConfig(string path) {
@@ -57,17 +57,30 @@ tuple<int,float> json::loadRANSACConfig(string path) {
   return {iterations, inliers_threshold};
 }
 
-Tracker json::loadMatchConfig(string path) {
+tuple<int,float,float, float> json::loadICPConfig(string path) {
+  Json::Reader reader;
+  Json::Value cfg;
+  std::ifstream file(path);
+  reader.parse(file, cfg);
+
+  int iterations = cfg["ICP"]["iterations"].asInt();
+  float kernel_threshold = cfg["ICP"]["kernel_threshold"].asFloat();
+  float damping = cfg["ICP"]["damping"].asFloat();
+  float inliers_threshold = cfg["ICP"]["inliers_threshold"].asFloat();
+
+  return {iterations, kernel_threshold, inliers_threshold, damping};
+}
+
+tuple<string,float,int,int> json::loadMatchConfig(string path) {
   Json::Reader reader;
   Json::Value cfg;
   std::ifstream file(path);
   reader.parse(file, cfg);
 
   string type = cfg["Matcher"]["type"].asString();
-  Matcher matcher = type == "brute-force" ? Matcher::BFMatcher : Matcher::FLANNMatcher;
   float knn_threshold = cfg["Matcher"]["knn_threshold"].asFloat();
   int norm_threshold = cfg["Matcher"]["norm_threshold"].asInt();
   int norm_type = cfg["Matcher"]["norm_type"].asInt();
 
-  return Tracker(matcher, knn_threshold, norm_threshold, norm_type);
+  return {type, knn_threshold, norm_threshold, norm_type};
 }

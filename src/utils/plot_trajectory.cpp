@@ -62,7 +62,7 @@ int main(int argc, char **argv) {
   vector<float> x_lidar, y_lidar;
   vector<float> x_gps, y_gps;
 
-  Affine3f pose = Registrator::computeAlignment(pointset);
+  Affine3f pose = computeAlignment(pointset);
   for (auto& pair : pointset) {
     Point3f gps_point_inlidarframe = pose*pair.first;
     Point3f lidar_point = pair.second;

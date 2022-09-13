@@ -3,8 +3,9 @@ add_library(utils
     cloud_helper.cpp cloud_helper.hpp
     json_helper.cpp json_helper.hpp
     gps_helper.cpp gps_helper.hpp
-    ransac.hpp
+    ransac.cpp ransac.hpp 
     define.hpp
+    icp.cpp icp.hpp
     matplotlibcpp.hpp)
     
 target_link_libraries(utils 

@@ -4,6 +4,7 @@ add_library(core
   projector.cpp projector.hpp
   superpoint.cpp superpoint.hpp
   tracker.cpp tracker.hpp
+  pose.hpp pose.cpp
   registrator.cpp registrator.hpp)
 
 target_link_libraries(core 

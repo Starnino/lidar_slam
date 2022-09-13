@@ -17,7 +17,8 @@ int main(int argc, char **argv) {
   }
   
   string path = ros::package::getPath(PACKAGE_NAME);
-  Projector projector = json::loadProjectorConfig(path+LIDAR_CONFIG_FILE);
+  auto [height, width, fov_up, fov_down, max_depth, max_intensity] = json::loadProjectorConfig(path+LIDAR_CONFIG_FILE);
+  Projector projector(height, width, fov_up, fov_down, max_depth, max_intensity);
 
   rosbag::Bag bag(argv[1]);
   for (rosbag::MessageInstance const m: rosbag::View(bag)) {
@@ -31,8 +32,6 @@ int main(int argc, char **argv) {
     cv::waitKey(1);
     cv::imshow("Depth", img.depth());
     cv::waitKey(1);
-
-    break;
   }
   
   bag.close();

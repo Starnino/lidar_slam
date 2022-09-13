@@ -2,6 +2,7 @@
 #include <utils/cloud_helper.hpp>
 #include <utils/json_helper.cpp>
 #include <utils/define.hpp>
+#include <core/superpoint.hpp>
 #include <ros/package.h>
 #include <rosbag/bag.h>
 #include <rosbag/view.h>
@@ -18,10 +19,12 @@ int main(int argc, char **argv) {
   }
   
   string path = ros::package::getPath(PACKAGE_NAME);
-  
-  Projector projector = json::loadProjectorConfig(path + LIDAR_CONFIG_FILE);
-  //SuperPointDetector superpoint = json::loadSuperPointConfig(path, DETECTOR_CONFIG_FILE);
-  cv::Ptr<cv::FeatureDetector> detector = json::loadORBConfig(path + DETECTOR_CONFIG_FILE);
+  auto [height, width, fov_up, fov_down, max_depth, max_intensity] = json::loadProjectorConfig(path+LIDAR_CONFIG_FILE);
+  Projector projector(height, width, fov_up, fov_down, max_depth, max_intensity);
+  //auto [sp_threshold, nms_dist, weights_file] = json::loadSuperPointConfig(path, DETECTOR_CONFIG_FILE);
+  //SuperPointDetector detector(-1, sp_threshold, nms_dist, false, path + weights_file);
+  auto [nfeatures, scale, nlevels, edge_threshold, patch_size, fast_threshold] = json::loadORBConfig(path+DETECTOR_CONFIG_FILE);
+  cv::Ptr<cv::FeatureDetector> detector = cv::ORB::create(nfeatures, scale, nlevels, edge_threshold, 0, 2, cv::ORB::HARRIS_SCORE, patch_size, fast_threshold);
   rosbag::Bag bag(argv[1]);
   for (rosbag::MessageInstance const m: rosbag::View(bag)) {
     if (m.getTopic() != CLOUD_TOPIC) continue;
@@ -31,6 +34,7 @@ int main(int argc, char **argv) {
     Image img = pointCloud2Img(cloud, projector).convertToCV8U();
 
     vector<cv::KeyPoint> keypoints;
+    //superpoint.detect(img.intensity(), keypoints);
     detector->detect(img.intensity(), keypoints);
     
     img.drawKeypoints(keypoints);

@@ -15,7 +15,7 @@ using std::tuple;
 using Pointset2f = vector<pair<cv::Point2f,cv::Point2f>>;
 using Descriptor = Eigen::VectorXf;
 
-enum class Matcher {BFMatcher, FLANNMatcher, };
+enum class Matcher {BFMatcher, FLANNMatcher};
 
 class Tracker {
 

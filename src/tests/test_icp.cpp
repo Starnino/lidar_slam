@@ -30,11 +30,13 @@ int main(int argc, char **argv) {
     set.push_back({Point3f::Random()*10, Point3f::Random()*10});
   }
 
-  Pose pose(ICP(Affine3f::Identity(), set, iterations, kernel_threshold, damping));
+  auto [transform, chi] = ICP(set, iterations, kernel_threshold, damping);
+  Pose pose(transform);
   pose.evaluate(set, inliers_threshold);
 
   cout << "Estimated pose\n";
   cout << pose.transform().affine() << "\n";
   cout << "\nNumber of inliers = " << pose.inliers().size() << "\n";
+  
   return 0;
 }

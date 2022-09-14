@@ -20,7 +20,7 @@ int main(int argc, char **argv) {
   }
 
   string path = ros::package::getPath(PACKAGE_NAME);
-  auto [height, width, fov_up, fov_down, max_depth, max_intensity] = json::loadProjectorConfig(path+LIDAR_CONFIG_FILE);
+  auto [height, width, fov_up, fov_down, max_depth, max_intensity] = json::loadProjectorConfig(path + LIDAR_CONFIG_FILE);
   auto [sp_threshold, nms_dist, weights_file] = json::loadSuperPointConfig(path, DETECTOR_CONFIG_FILE);
   auto [type, knn_threshold, norm_threshold, norm_type] = json::loadMatchConfig(path + MATCH_CONFIG_FILE);
   Matcher matcher = type == "brute-force" ? Matcher::BFMatcher : Matcher::FLANNMatcher;

@@ -24,4 +24,4 @@ using Pointset3f = vector<pair<Point3f,Point3f>>;
 Affine3f vector2transform(Vector6f v);
 Matrix3f skew(Vector3f v);
 tuple<Vector3f,Matrix3x6f> errorAndJacobian(Affine3f pose, Point3f point, Point3f measurements);
-Affine3f ICP(Affine3f guess, Pointset3f correspondences, int iterations, float kernel_threshold, float damping);
+tuple<Affine3f,vector<float>> ICP(Pointset3f points, int iterations, float kernel_threshold, float damping, Affine3f guess = Affine3f::Identity());

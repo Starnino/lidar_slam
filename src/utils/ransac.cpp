@@ -57,7 +57,7 @@ tuple<bool,Pose> RANSAC(Pointset3f& data, int num_iterations, float inliers_thre
     Pointset3f random_data = randomSelect(data, n);
     model.setTransform(computeAlignment(random_data));
     int score = model.evaluate(data, inliers_threshold);
-    
+
     if (score > best_score) {
       best_model = model.clone();
       best_score = score;

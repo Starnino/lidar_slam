@@ -4,10 +4,11 @@
 #include <tuple>
 #include <utils/ransac.hpp>
 #include <utils/icp.hpp>
+#include <iostream>
 
 using std::string;
 
-enum class Estimator {RANSAC, ICP};
+enum class Estimator {ICP, RANSAC};
 
 class Registrator {
     
@@ -27,6 +28,9 @@ class Registrator {
       _inliers_threshold = inliers_threshold;
       _kernel_threshold = kernel_threshold;
       _damping = damping;
+
+      string e = _estimator == Estimator::ICP ? "ICP" : "RANSAC";
+      std::cout << "Registrator| using " << e << "\n";
     }
     tuple<bool, Pose> registerPoints(Pointset3f& points);
 };

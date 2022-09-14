@@ -19,7 +19,7 @@ int main(int argc, char **argv) {
   }
   
   string path = ros::package::getPath(PACKAGE_NAME);
-  auto [height, width, fov_up, fov_down, max_depth, max_intensity] = json::loadProjectorConfig(path+LIDAR_CONFIG_FILE);
+  auto [height, width, fov_up, fov_down, max_depth, max_intensity] = json::loadProjectorConfig(path + LIDAR_CONFIG_FILE);
   Projector projector(height, width, fov_up, fov_down, max_depth, max_intensity);
   //auto [sp_threshold, nms_dist, weights_file] = json::loadSuperPointConfig(path, DETECTOR_CONFIG_FILE);
   //SuperPointDetector detector(-1, sp_threshold, nms_dist, false, path + weights_file);

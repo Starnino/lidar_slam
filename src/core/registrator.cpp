@@ -7,13 +7,14 @@ tuple<bool,Pose> Registrator::registerPoints(Pointset3f& points) {
       auto [found, pose] = RANSAC(points, _iterations, _inliers_threshold, 3);
       if (found) {
         pose.setTransform(computeAlignment(pose.inliers()));
-        _prev_pose = pose;
+        _prev_pose = pose;  
         return {true, pose};
       }
     }
 
     else if (_estimator == Estimator::ICP) {
-      Pose pose(ICP(_prev_pose.transform(), points, _iterations, _kernel_threshold, _damping));
+      auto [transform, chi] = ICP(points, _iterations, _kernel_threshold, _damping, _prev_pose.transform());
+      Pose pose(transform);
       int score = pose.evaluate(points, _inliers_threshold);
       if (score > 0) {
         _prev_pose = pose;

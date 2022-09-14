@@ -27,9 +27,8 @@ tuple<Vector3f,Matrix3x6f> errorAndJacobian(Affine3f pose, Point3f p, Point3f z)
   return {e,J};
 }
 
-Affine3f ICP(Affine3f guess, Pointset3f points, int iterations, float kernel_threshold, float damping) {
+tuple<Affine3f,vector<float>> ICP(Pointset3f points, int iterations, float kernel_threshold, float damping, Affine3f guess) {
   Affine3f pose = guess;
-  //_num_inliers = vector<int>(iterations);
   vector<float> chi_tot(iterations);
 
   for (int i = 0; i < iterations; ++i) {
@@ -46,7 +45,6 @@ Affine3f ICP(Affine3f guess, Pointset3f points, int iterations, float kernel_thr
         lambda = sqrt(kernel_threshold/chi);
         chi = kernel_threshold;
       }
-      //else _num_inliers[i]++;
       chi_tot[i] += chi;
 
       // update H and b
@@ -56,8 +54,8 @@ Affine3f ICP(Affine3f guess, Pointset3f points, int iterations, float kernel_thr
 
     H += Matrix6f::Identity()*damping;
     Vector6f delta = H.ldlt().solve(-b);
-    pose = vector2transform(delta)*pose;
+    pose = vector2transform(delta)*pose;    
   }
-  return pose;
+  return {pose, chi_tot};
 }
 

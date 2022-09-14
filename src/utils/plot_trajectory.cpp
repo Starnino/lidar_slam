@@ -72,6 +72,15 @@ int main(int argc, char **argv) {
     y_gps.push_back(gps_point_inlidarframe[1]);
   }
 
+  // rmse error
+  float l2 = 0.f;
+  size_t size = x_lidar.size();
+  for (size_t i = 0; i < size; ++i) {
+    l2 += sqrt(pow(x_gps[i]-x_lidar[i],2) + pow(y_gps[i]-y_lidar[i],2));
+  }
+  float rmse = sqrt(l2/size);
+  cout << "Root Mean Square Error = " << rmse << "\n";
+
   // plot trajectories
   plt::plot(x_gps, y_gps, {{"label", "gps"}});
   plt::plot(x_lidar, y_lidar, {{"label", "lidar"}});

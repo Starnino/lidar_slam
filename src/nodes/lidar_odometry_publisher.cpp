@@ -6,6 +6,7 @@
 #include <utils/gps_helper.hpp>
 #include <utils/json_helper.cpp>
 #include <utils/define.hpp>
+#include <utils/input_parser.hpp>
 #include <core/superpoint.hpp>
 #include <core/tracker.hpp>
 #include <core/registrator.hpp>
@@ -19,17 +20,26 @@ int main(int argc, char **argv) {
   ros::Publisher odom_publisher = nh.advertise<nav_msgs::Odometry>(LIDAR_ODOMETRY_TOPIC, 50);
 
   string path = ros::package::getPath(PACKAGE_NAME);
+  InputParser input(argc, argv);
+  Estimator estimator;
+  int iterations; float inliers_threshold; float kernel_threshold = 0.f; float damping = 0.f;
+  if (input.cmdOptionExists("-estimator") && input.getCmdOption("-estimator") == "ransac") {
+    estimator = Estimator::RANSAC;
+    std::tie(iterations, inliers_threshold) = json::loadRANSACConfig(path + RANSAC_CONFIG_FILE);
+  }
+  else {
+    estimator = Estimator::ICP;
+    std::tie(iterations, kernel_threshold, damping, inliers_threshold) = json::loadICPConfig(path + ICP_CONFIG_FILE);
+  }
   auto [height, width, fov_up, fov_down, max_depth, max_intensity] = json::loadProjectorConfig(path+LIDAR_CONFIG_FILE);
   auto [sp_threshold, nms_dist, weights_file] = json::loadSuperPointConfig(path, DETECTOR_CONFIG_FILE);
   auto [type, knn_threshold, norm_threshold, norm_type] = json::loadMatchConfig(path + MATCH_CONFIG_FILE);
   Matcher matcher = type == "brute-force" ? Matcher::BFMatcher : Matcher::FLANNMatcher;
-  auto [iterations, inliers_threshold] = json::loadRANSACConfig(path + RANSAC_CONFIG_FILE);
-  //auto [iterations, kernel_threshold, damping, inliers_threshold] = json::loadICPConfig(path + ICP_CONFIG_FILE);
   
   Projector projector(height, width, fov_up, fov_down, max_depth, max_intensity);
   SuperPointDetector detector(-1, sp_threshold, nms_dist, false, path + weights_file);
   Tracker tracker(matcher, knn_threshold, norm_threshold, norm_type);
-  Registrator registrator = Registrator(Estimator::RANSAC, iterations, inliers_threshold);
+  Registrator registrator = Registrator(estimator, iterations, inliers_threshold, kernel_threshold, damping);
 
   Pose pose;
   

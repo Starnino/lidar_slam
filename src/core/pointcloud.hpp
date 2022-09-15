@@ -15,6 +15,7 @@ class PointCloud {
     int _h;
     
   public:
+    PointCloud() = default;
     explicit PointCloud(int height, int width);
         
     inline const ArrayXf& x() { return _x; }

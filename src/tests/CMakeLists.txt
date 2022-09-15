@@ -26,3 +26,7 @@ target_link_libraries(test_lidar_trajectory core utils ${OpenCV_LIBS} ${catkin_L
 add_executable(test_gps_trajectory test_gps_trajectory.cpp)
 set_source_files_properties(test_gps_trajectory.cpp PROPERTIES COMPILE_FLAGS "-DWITHOUT_NUMPY" )
 target_link_libraries(test_gps_trajectory utils ${catkin_LIBRARIES} ${PYTHON_LIBRARIES})
+
+add_executable(test_match_trajectory test_match_trajectory.cpp)
+set_source_files_properties(test_match_trajectory.cpp PROPERTIES COMPILE_FLAGS "-DWITHOUT_NUMPY" )
+target_link_libraries(test_match_trajectory core utils ${OpenCV_LIBS} ${catkin_LIBRARIES} ${TORCH_LIBRARIES} ${PYTHON_LIBRARIES})

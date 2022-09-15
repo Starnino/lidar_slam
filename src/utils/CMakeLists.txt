@@ -12,7 +12,3 @@ target_link_libraries(utils
     core 
     OpenMP::OpenMP_CXX
     ${JSONCPP_LIBRARIES})
-
-add_executable(plot_trajectory plot_trajectory)
-set_source_files_properties(plot_trajectory PROPERTIES COMPILE_FLAGS "-DWITHOUT_NUMPY" )
-target_link_libraries(plot_trajectory utils ${catkin_LIBRARIES} ${PYTHON_LIBRARIES})

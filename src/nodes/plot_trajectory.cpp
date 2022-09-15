@@ -4,6 +4,8 @@
 #include <utils/matplotlibcpp.hpp>
 #include <utils/input_parser.hpp>
 #include <core/registrator.hpp>
+#include <utils/define.hpp>
+#include <ros/package.h>
 
 using std::cout;
 using std::string;
@@ -32,13 +34,12 @@ int main(int argc, char **argv) {
   
   if (argc < 2) {
     cout << "Usage: lidar_projection [PATH TO TRAJECTORY FILE] [OPTION]\n";
-    cout << "   -s   save file to the same path";
+    cout << "   -save [NAME]  save plot with specified <name>";
     return 1;
   }
+  string path = ros::package::getPath(PACKAGE_NAME);
   InputParser input(argc, argv);
   string filename(input.getArg(0));
-  bool save = false;
-  if (input.cmdOptionExists("-s")) save = true;
   
   std::ifstream file(filename);
   if(!file) {
@@ -88,7 +89,7 @@ int main(int argc, char **argv) {
   plt::title("Trajectory");
   plt::xlabel("x [m]");
   plt::ylabel("y [m]");
-  if (save) plt::savefig(filename.substr(0,filename.size()-3) + "pdf");
+  if (input.cmdOptionExists("-s")) plt::savefig(path + "/plots/" + input.getCmdOption("-save") + ".pdf");
   plt::show();
 
   return 0;

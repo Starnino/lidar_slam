@@ -38,8 +38,7 @@ int main(int argc, char **argv) {
     
     sensor_msgs::PointCloud2::ConstPtr cloud_msg = m.instantiate<sensor_msgs::PointCloud2>();
     PointCloud cloud = deserializeCloudMsg(cloud_msg);
-    Image img = pointCloud2Img(cloud, projector);
-    
+    Image img = pointCloud2Img(cloud, projector); 
     vector<cv::KeyPoint> keypoints; cv::Mat descriptors;
     detector.detectAndCompute(img.intensity(), keypoints, descriptors);
     auto [matches2D, matches3D] = tracker.update(keypoints, descriptors, img);

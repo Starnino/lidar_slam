@@ -53,14 +53,13 @@ int main(int argc, char **argv) {
   for (rosbag::MessageInstance const m: rosbag::View(bag)) {
     if (m.getTopic() != CLOUD_TOPIC) continue;
     count++;
+    sensor_msgs::PointCloud2::ConstPtr cloud_msg = m.instantiate<sensor_msgs::PointCloud2>();
+    
     auto start = std::chrono::steady_clock::now();
     
-    sensor_msgs::PointCloud2::ConstPtr cloud_msg = m.instantiate<sensor_msgs::PointCloud2>();
     PointCloud cloud = deserializeCloudMsg(cloud_msg);
     Image img = pointCloud2Img(cloud, projector);
-    
-    cv::Mat mat; vector<cv::KeyPoint> keypoints; cv::Mat descriptors;
-    cv::cvtColor(img.intensity(), mat, cv::COLOR_GRAY2RGB);
+    vector<cv::KeyPoint> keypoints; cv::Mat descriptors;
     detector.detectAndCompute(img.intensity(), keypoints, descriptors);
     Pointset3f matches = std::get<1>(tracker.update(keypoints, descriptors, img));
     auto [found, transform] = registrator.registerPoints(matches);

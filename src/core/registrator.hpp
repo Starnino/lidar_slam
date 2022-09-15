@@ -21,6 +21,7 @@ class Registrator {
     float _damping;
 
   public:
+    inline Registrator() = default;
     inline explicit Registrator(Estimator estimator, int iterations, float inliers_threshold, float kernel_threshold = 0, float damping = 0) {
       srand(time(NULL));
       _estimator = estimator;

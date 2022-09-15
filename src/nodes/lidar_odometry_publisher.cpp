@@ -14,23 +14,26 @@
 using std::cout;
 
 int main(int argc, char **argv) {
-  
-  ros::init(argc, argv, "lidar_odometry_publisher");
-  ros::NodeHandle nh;
-  ros::Publisher odom_publisher = nh.advertise<nav_msgs::Odometry>(LIDAR_ODOMETRY_TOPIC, 50);
 
   string path = ros::package::getPath(PACKAGE_NAME);
   InputParser input(argc, argv);
-  Estimator estimator;
+  Estimator estimator; string method;
   int iterations; float inliers_threshold; float kernel_threshold = 0.f; float damping = 0.f;
   if (input.cmdOptionExists("-estimator") && input.getCmdOption("-estimator") == "ransac") {
-    estimator = Estimator::RANSAC;
-    std::tie(iterations, inliers_threshold) = json::loadRANSACConfig(path + RANSAC_CONFIG_FILE);
-  }
-  else {
     estimator = Estimator::ICP;
+    method = "icp";
     std::tie(iterations, kernel_threshold, damping, inliers_threshold) = json::loadICPConfig(path + ICP_CONFIG_FILE);
   }
+  else {
+    estimator = Estimator::RANSAC;
+    method = "ransac";
+    std::tie(iterations, inliers_threshold) = json::loadRANSACConfig(path + RANSAC_CONFIG_FILE);
+  }
+
+  ros::init(argc, argv, "lidar_odometry_publisher " + method);
+  ros::NodeHandle nh;
+  ros::Publisher odom_publisher = nh.advertise<nav_msgs::Odometry>(LIDAR_ODOMETRY_TOPIC, 50);
+
   auto [height, width, fov_up, fov_down, max_depth, max_intensity] = json::loadProjectorConfig(path+LIDAR_CONFIG_FILE);
   auto [sp_threshold, nms_dist, weights_file] = json::loadSuperPointConfig(path, DETECTOR_CONFIG_FILE);
   auto [type, knn_threshold, norm_threshold, norm_type] = json::loadMatchConfig(path + MATCH_CONFIG_FILE);

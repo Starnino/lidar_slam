@@ -38,8 +38,8 @@ int main(int argc, char **argv) {
   
   trajectory_file.open(argv[1]);
   Subscriber<nav_msgs::Odometry> gps_sub(nh, GPS_ODOMETRY_TOPIC, 1);
-  Subscriber<nav_msgs::Odometry> lidar_sub(nh, LIDAR_ODOMETRY_TOPIC, 1);
-  Synchronizer<ApproximateTimePolicy> sync(ApproximateTimePolicy(10), gps_sub, lidar_sub);
+  Subscriber<nav_msgs::Odometry> icp_lidar_sub(nh, LIDAR_ODOMETRY_TOPIC, 1);
+  Synchronizer<ApproximateTimePolicy> sync(ApproximateTimePolicy(10), gps_sub, icp_lidar_sub);
   sync.registerCallback(callback);
 
   ros::spin();

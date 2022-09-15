@@ -17,20 +17,18 @@ int main(int argc, char **argv) {
 
   string path = ros::package::getPath(PACKAGE_NAME);
   InputParser input(argc, argv);
-  Estimator estimator; string method;
+  Estimator estimator;
   int iterations; float inliers_threshold; float kernel_threshold = 0.f; float damping = 0.f;
   if (input.cmdOptionExists("-estimator") && input.getCmdOption("-estimator") == "ransac") {
-    estimator = Estimator::ICP;
-    method = "icp";
-    std::tie(iterations, kernel_threshold, damping, inliers_threshold) = json::loadICPConfig(path + ICP_CONFIG_FILE);
-  }
-  else {
     estimator = Estimator::RANSAC;
-    method = "ransac";
     std::tie(iterations, inliers_threshold) = json::loadRANSACConfig(path + RANSAC_CONFIG_FILE);
   }
+  else {
+    estimator = Estimator::ICP;
+    std::tie(iterations, kernel_threshold, damping, inliers_threshold) = json::loadICPConfig(path + ICP_CONFIG_FILE);
+  }
 
-  ros::init(argc, argv, "lidar_odometry_publisher " + method);
+  ros::init(argc, argv, "lidar_odometry_publisher");
   ros::NodeHandle nh;
   ros::Publisher odom_publisher = nh.advertise<nav_msgs::Odometry>(LIDAR_ODOMETRY_TOPIC, 50);
 

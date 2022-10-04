@@ -16,12 +16,9 @@ Image& Image::convertToCV8U() {
   return *this;
 }
 
-void Image::drawKeypoints(std::vector<cv::KeyPoint>& keypoints) {
+void Image::drawKeypoints(std::vector<cv::KeyPoint>& keypoints, cv::Scalar color) {
     cv::cvtColor(_intensity, _intensity, cv::COLOR_GRAY2RGB);
     cv::cvtColor(_depth, _depth, cv::COLOR_GRAY2RGB);
-    cv::Scalar color;
-    if (_type == CV_32F) color = {0.f, 0.f, 1.f};
-    else color = {0, 0, 255};
     for (const cv::KeyPoint &keypoint : keypoints) {
       cv::circle(_intensity, keypoint.pt, 2, color, cv::FILLED);
       cv::circle(_depth, keypoint.pt, 2, color, cv::FILLED);

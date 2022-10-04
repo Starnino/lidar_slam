@@ -56,7 +56,7 @@ class Image {
       return Vector3f(_xyz[index], _xyz[index+1], _xyz[index+2]);
     }
     Image& convertToCV8U();
-    void drawKeypoints(vector<cv::KeyPoint>& keypoints);
+    void drawKeypoints(vector<cv::KeyPoint>& keypoints, cv::Scalar color = {0.f,0.f,1.f});
     void drawTracks(unordered_map<int,pair<vector<cv::Point2f>,cv::Scalar>>& tracks);
     static cv::Mat drawMatches(Image& img1, Image& img2, const Pointset2f& matches, const vector<bool>& inliers_mask);
 };

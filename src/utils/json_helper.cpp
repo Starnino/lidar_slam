@@ -16,17 +16,18 @@ tuple<int,int,float,float,float,float> json::loadProjectorConfig(string path) {
   return {height, width, fov_up, fov_down, max_depth, max_intensity};
 }
 
-tuple<float,float,string> json::loadSuperPointConfig(string path, string config_filename) {
+tuple<int,float,float,string> json::loadSuperPointConfig(string path, string config_filename) {
   Json::Reader reader;
   Json::Value cfg;
   std::ifstream file(path + config_filename);
   reader.parse(file, cfg);
 
+  int nfeatures = cfg["SuperPoint"]["nfeatures"].asInt();
   float threshold = cfg["SuperPoint"]["threshold"].asFloat();
   float nms_dist = cfg["SuperPoint"]["nms_dist"].asFloat();
   string weights_file = cfg["SuperPoint"]["weights_file"].asString();
 
-  return {threshold, nms_dist, weights_file};
+  return {nfeatures, threshold, nms_dist, weights_file};
 }
 
 tuple<int,float,int,int,int,int> json::loadORBConfig(string path) {

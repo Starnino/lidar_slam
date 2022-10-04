@@ -33,12 +33,12 @@ int main(int argc, char **argv) {
   ros::Publisher odom_publisher = nh.advertise<nav_msgs::Odometry>(LIDAR_ODOMETRY_TOPIC, 50);
 
   auto [height, width, fov_up, fov_down, max_depth, max_intensity] = json::loadProjectorConfig(path+LIDAR_CONFIG_FILE);
-  auto [sp_threshold, nms_dist, weights_file] = json::loadSuperPointConfig(path, DETECTOR_CONFIG_FILE);
+  auto [nfeatures, sp_threshold, nms_dist, weights_file] = json::loadSuperPointConfig(path, DETECTOR_CONFIG_FILE);
   auto [type, knn_threshold, norm_threshold, norm_type] = json::loadMatchConfig(path + MATCH_CONFIG_FILE);
   Matcher matcher = type == "brute-force" ? Matcher::BFMatcher : Matcher::FLANNMatcher;
   
   Projector projector(height, width, fov_up, fov_down, max_depth, max_intensity);
-  SuperPointDetector detector(-1, sp_threshold, nms_dist, false, path + weights_file);
+  SuperPointDetector detector(nfeatures, sp_threshold, nms_dist, false, path + weights_file);
   Tracker tracker(matcher, knn_threshold, norm_threshold, norm_type);
   Registrator registrator = Registrator(estimator, iterations, inliers_threshold, kernel_threshold, damping);
 

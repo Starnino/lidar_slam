@@ -21,24 +21,26 @@ Matrix3f skew(Vector3f v) {
 tuple<Vector3f,Matrix3x6f> errorAndJacobian(Affine3f pose, Point3f p, Point3f z) {
   Point3f z_hat = pose*p;
   Vector3f e = z_hat - z;
-  Matrix3x6f J = Matrix3x6f::Zero();
+  Matrix3x6f J = Matrix3x6f::Zero(); 
   J.block<3,3>(0,0).setIdentity();
-  J.block<3,3>(0,3) = -skew(z_hat);
+  J.block<3,3>(0,3) = -skew(z_hat); 
   return {e,J};
 }
 
 tuple<Affine3f,vector<float>> ICP(Pointset3f points, int iterations, float kernel_threshold, float damping, Affine3f guess) {
   Affine3f pose = guess;
   vector<float> chi_tot(iterations);
+  Matrix6f H;
+  Vector6f b;
 
   for (int i = 0; i < iterations; ++i) {
-    Matrix6f H = Matrix6f::Zero();
-    Vector6f b = Vector6f::Zero();
+    H.setZero();
+    b.setZero();
 
     for (pair<Point3f,Point3f>& pointpair : points) {
       auto [e,J] = errorAndJacobian(pose, pointpair.first, pointpair.second);
   
-      // chi2
+      // kernel
       float chi = e.dot(e);
       float lambda = 1;
       if (chi > kernel_threshold) {

@@ -52,7 +52,7 @@ message("${PYTHON_INCLUDE_DIRS}")
 catkin_package(
    INCLUDE_DIRS src
    LIBRARIES core utils
-   CATKIN_DEPENDS roscpp sensor_msgs rosbag
+   CATKIN_DEPENDS roscpp sensor_msgs rosbag message_filters
    DEPENDS )
 
 ## Search include files

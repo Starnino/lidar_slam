@@ -57,6 +57,7 @@ int main(int argc, char **argv) {
       pose = pose*transform;
       Eigen::Quaternionf quaternion(pose.rotation());
 
+      // publish odometry msg
       nav_msgs::Odometry odom;
       odom.header.stamp = ros::Time::now();
       odom.header.frame_id = "initial_pose";

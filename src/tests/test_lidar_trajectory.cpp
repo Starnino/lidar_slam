@@ -28,12 +28,14 @@ int main(int argc, char **argv) {
   
   InputParser input(argc, argv);
   Estimator estimator;
+  bool icp = false;
   int iterations; float inliers_threshold; float kernel_threshold = 0.f; float damping = 0.f;
   if (input.cmdOptionExists("-estimator") && input.getCmdOption("-estimator") == "ransac") {
     estimator = Estimator::RANSAC;
     std::tie(iterations, inliers_threshold) = json::loadRANSACConfig(path + RANSAC_CONFIG_FILE);
   }
   else {
+    icp = true;
     estimator = Estimator::ICP;
     std::tie(iterations, kernel_threshold, damping, inliers_threshold) = json::loadICPConfig(path + ICP_CONFIG_FILE);
   }
@@ -84,7 +86,9 @@ int main(int argc, char **argv) {
   cout << "data processed at " << (count/ms)*1e3 << " Hz\n";
 
   // plot trajectories
-  plt::plot(x_lidar, y_lidar, "tab:red");
+  
+  if (icp) plt::plot(x_lidar, y_lidar, "tab:red", {{"label", "lidar-icp"}});
+  else plt::plot(x_lidar, y_lidar, "tab:green", {{"label", "lidar-ransac"}});
   plt::title("Lidar Trajectory");
   plt::xlabel("x [m]");
   plt::ylabel("y [m]");

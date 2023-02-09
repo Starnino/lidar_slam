@@ -18,3 +18,4 @@ This thesis project focuses on the exploitation of LiDAR information using a cla
 [![estimation.png](https://i.postimg.cc/kXkhwYRJ/estimation.png)](https://postimg.cc/1frH3HK2)
 
 ## [Report](https://github.com/Starnino/lidar_slam/blob/main/Sparse_LiDAR_Odometry.pdf)
+## [Presentation](https://github.com/Starnino/lidar_slam/blob/main/thesis-presentation.pdf)
